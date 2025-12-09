@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ProfilePage() {
-  const { user, notes, logout } = useStore();
+  const { user, pages, logout } = useStore();
   const [, setLocation] = useLocation();
 
   // Redirect if not logged in (mock protection)
@@ -17,13 +17,18 @@ export default function ProfilePage() {
   }
 
   // Calculate Stats
-  const totalNotes = notes.length;
-  const totalWords = notes.reduce((acc, note) => acc + (note.content?.split(" ").length || 0), 0);
+  const totalPages = pages.length;
+  // Approximating words from JSON content is hard, so let's just count blocks or raw text length
+  const totalWords = pages.reduce((acc, page) => {
+      // Very rough approximation: JSON string length / 6
+      return acc + Math.floor(JSON.stringify(page.content).length / 6);
+  }, 0);
+  
   const formattedWords = totalWords > 1000 ? `${(totalWords / 1000).toFixed(1)}k` : totalWords;
   const daysActive = user.joinDate ? formatDistanceToNow(user.joinDate, { addSuffix: false }) : "1 day";
 
   const stats = [
-    { label: "Total Notes", value: totalNotes.toString(), icon: BarChart2 },
+    { label: "Total Pages", value: totalPages.toString(), icon: BarChart2 },
     { label: "Words Written", value: formattedWords.toString(), icon: Edit2 },
     { label: "Member Since", value: daysActive, icon: Calendar },
   ];

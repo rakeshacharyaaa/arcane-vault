@@ -1,11 +1,16 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { JSONContent } from '@tiptap/react';
 
-export interface Note {
+export interface Page {
   id: string;
   title: string;
-  content: string;
+  icon: string | null;
+  coverImage: string | null;
+  content: JSONContent; // TipTap JSON
   tags: string[];
+  parentId: string | null;
+  isExpanded: boolean; // For sidebar
   createdAt: number;
   updatedAt: number;
 }
@@ -24,38 +29,69 @@ interface AppState {
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
 
-  // Notes State
-  notes: Note[];
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (id: string, updates: Partial<Note>) => void;
-  deleteNote: (id: string) => void;
+  // Pages State
+  pages: Page[];
+  addPage: (parentId?: string | null) => string; // Returns new page ID
+  updatePage: (id: string, updates: Partial<Page>) => void;
+  deletePage: (id: string) => void;
+  togglePageExpand: (id: string) => void;
+  reorderPage: (id: string, newParentId: string | null) => void;
 }
 
-// Initial Mock Data (only used if storage is empty)
-const INITIAL_NOTES: Note[] = [
+const INITIAL_CONTENT: JSONContent = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      content: [{ type: 'text', text: 'Welcome to your new vault. Type "/" to browse commands.' }]
+    }
+  ]
+};
+
+const INITIAL_PAGES: Page[] = [
   {
-    id: "1",
-    title: "Project Aether",
-    content: "The goal is to create a seamless interface between the user's intent and the digital manifestation. \n\nKey pillars:\n- Minimality\n- Speed\n- Aesthetic depth\n\nNeed to research more on glassmorphism best practices for performance.",
-    tags: ["design", "ideas"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
+    id: "root-1",
+    title: "Getting Started",
+    icon: "🚀",
+    coverImage: null,
+    content: INITIAL_CONTENT,
+    tags: ["guide", "welcome"],
+    parentId: null,
+    isExpanded: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   },
   {
-    id: "2",
-    title: "Dream Journal",
-    content: "Walking through a city made of crystal. The light was refracting through the buildings, creating rainbows on the streets. I felt a sense of calm urgency.",
-    tags: ["personal", "dreams"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
+    id: "root-2",
+    title: "Personal",
+    icon: "🔒",
+    coverImage: null,
+    content: { type: 'doc', content: [] },
+    tags: [],
+    parentId: null,
+    isExpanded: true,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: "child-1",
+    title: "Journal",
+    icon: "📔",
+    coverImage: null,
+    content: { type: 'doc', content: [] },
+    tags: ["daily"],
+    parentId: "root-2",
+    isExpanded: false,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   },
 ];
 
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
-      notes: INITIAL_NOTES,
+      pages: INITIAL_PAGES,
 
       login: (email: string) => set({
         user: {
@@ -72,31 +108,67 @@ export const useStore = create<AppState>()(
         user: state.user ? { ...state.user, ...updates } : null
       })),
 
-      addNote: (noteData) => set((state) => {
+      addPage: (parentId = null) => {
+        const id = Math.random().toString(36).substr(2, 9);
         const now = Date.now();
-        const newNote: Note = {
-          id: Math.random().toString(36).substr(2, 9),
+        const newPage: Page = {
+          id,
+          title: "Untitled",
+          icon: null,
+          coverImage: null,
+          content: { type: 'doc', content: [] },
+          tags: [],
+          parentId,
+          isExpanded: true,
           createdAt: now,
           updatedAt: now,
-          ...noteData,
         };
-        return { notes: [newNote, ...state.notes] };
-      }),
+        
+        set((state) => ({ pages: [...state.pages, newPage] }));
+        return id;
+      },
 
-      updateNote: (id, updates) => set((state) => ({
-        notes: state.notes.map((note) => 
-          note.id === id 
-            ? { ...note, ...updates, updatedAt: Date.now() } 
-            : note
+      updatePage: (id, updates) => set((state) => ({
+        pages: state.pages.map((p) => 
+          p.id === id 
+            ? { ...p, ...updates, updatedAt: Date.now() } 
+            : p
         )
       })),
 
-      deleteNote: (id) => set((state) => ({
-        notes: state.notes.filter((n) => n.id !== id)
+      deletePage: (id) => set((state) => {
+        // Recursive delete needed? For now, just delete the page and its direct children become orphans or are deleted too.
+        // Let's implement cascade delete for simplicity.
+        const idsToDelete = new Set<string>([id]);
+        
+        // Find all descendants
+        let currentSize = 0;
+        do {
+            currentSize = idsToDelete.size;
+            state.pages.forEach(p => {
+                if (p.parentId && idsToDelete.has(p.parentId)) {
+                    idsToDelete.add(p.id);
+                }
+            });
+        } while (idsToDelete.size > currentSize);
+
+        return {
+            pages: state.pages.filter(p => !idsToDelete.has(p.id))
+        };
+      }),
+
+      togglePageExpand: (id) => set((state) => ({
+        pages: state.pages.map((p) => 
+            p.id === id ? { ...p, isExpanded: !p.isExpanded } : p
+        )
       })),
+
+      reorderPage: (id, newParentId) => set((state) => ({
+          pages: state.pages.map(p => p.id === id ? { ...p, parentId: newParentId } : p)
+      }))
     }),
     {
-      name: 'arcane-vault-storage',
+      name: 'arcane-vault-pages',
       storage: createJSONStorage(() => localStorage),
     }
   )
