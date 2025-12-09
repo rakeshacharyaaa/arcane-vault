@@ -2,17 +2,25 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
+import { useStore } from "@/lib/store";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
+  const { login } = useStore();
+  
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication
-    setLocation("/");
+    if (!email || !password) return;
+    
+    // Simulate API call
+    setTimeout(() => {
+      login(email);
+      setLocation("/");
+    }, 800);
   };
 
   return (
@@ -89,6 +97,7 @@ export default function AuthPage() {
           {/* Toggle */}
           <div className="mt-8 text-center">
             <button
+              type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-neutral-500 hover:text-emerald-400 transition-colors"
             >

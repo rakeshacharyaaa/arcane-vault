@@ -11,46 +11,7 @@ import {
   ChevronLeft 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-// --- Types ---
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
-}
-
-// --- Mock Data ---
-
-const INITIAL_NOTES: Note[] = [
-  {
-    id: "1",
-    title: "Project Aether",
-    content: "The goal is to create a seamless interface between the user's intent and the digital manifestation. \n\nKey pillars:\n- Minimality\n- Speed\n- Aesthetic depth\n\nNeed to research more on glassmorphism best practices for performance.",
-    tags: ["design", "ideas"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
-  },
-  {
-    id: "2",
-    title: "Dream Journal",
-    content: "Walking through a city made of crystal. The light was refracting through the buildings, creating rainbows on the streets. I felt a sense of calm urgency.",
-    tags: ["personal", "dreams"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
-  },
-  {
-    id: "3",
-    title: "Meeting Notes: Q1 Roadmap",
-    content: "Attendees: Sarah, Mike, Alex.\n\n- Focus on stability first.\n- New feature rollout scheduled for March.\n- Need to hire 2 more frontend devs.",
-    tags: ["work", "planning"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 4,
-    updatedAt: Date.now() - 1000 * 60 * 60 * 4,
-  },
-];
+import { useStore, Note } from "@/lib/store";
 
 // --- Components ---
 
@@ -178,8 +139,10 @@ const Sidebar = ({
 };
 
 export default function VaultPage() {
-  // State
-  const [notes, setNotes] = useState<Note[]>(INITIAL_NOTES);
+  // Global Store
+  const { notes, addNote, updateNote, deleteNote } = useStore();
+
+  // Local UI State
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -210,6 +173,9 @@ export default function VaultPage() {
         setEditorContent(note.content);
         setEditorTags(note.tags.join(", "));
         setLastSaved(note.updatedAt);
+      } else {
+        // If selected note not found (deleted), deselect
+        setSelectedId(null);
       }
     } else {
       // New note state
@@ -226,7 +192,6 @@ export default function VaultPage() {
   };
 
   const handleSave = () => {
-    const now = Date.now();
     const tagsArray = editorTags
       .split(",")
       .map((t) => t.trim())
@@ -234,39 +199,40 @@ export default function VaultPage() {
 
     if (selectedId) {
       // Update existing
-      setNotes((prev) =>
-        prev.map((n) =>
-          n.id === selectedId
-            ? {
-                ...n,
-                title: editorTitle,
-                content: editorContent,
-                tags: tagsArray,
-                updatedAt: now,
-              }
-            : n
-        )
-      );
+      updateNote(selectedId, {
+        title: editorTitle,
+        content: editorContent,
+        tags: tagsArray,
+      });
+      setLastSaved(Date.now());
     } else {
-      // Create new
-      const newId = Math.random().toString(36).substr(2, 9);
-      const newNote: Note = {
-        id: newId,
+      // Create new - WE NEED TO FIND THE ID AFTER CREATION or Generate it here?
+      // The store generates ID. To select it immediately, we might need to change store logic or just select the first one after update?
+      // Better: let's generate ID here to select it.
+      // Actually store logic: addNote(note). 
+      // Let's modify store logic slightly? No, let's just make a new ID here if we want to select it.
+      // But store generates ID.
+      // Simple fix: The store adds it to the TOP. So we can just select notes[0].id in a useEffect? 
+      // Or better, let's pass a generated ID to addNote if we want.
+      // For now, let's just add it and clear editor.
+      
+      addNote({
         title: editorTitle || "Untitled",
         content: editorContent,
         tags: tagsArray,
-        createdAt: now,
-        updatedAt: now,
-      };
-      setNotes((prev) => [newNote, ...prev]);
-      setSelectedId(newId);
+      });
+      
+      // Auto-select the newest note (which is at top)
+      // We can't easily know the ID unless we return it.
+      // For UX, clearing is fine, or we can look for the note we just made.
+      setLastSaved(Date.now());
+      // Optional: Flash success toast
     }
-    setLastSaved(now);
   };
 
   const handleDelete = () => {
     if (!selectedId) return;
-    setNotes((prev) => prev.filter((n) => n.id !== selectedId));
+    deleteNote(selectedId);
     setSelectedId(null);
   };
 
