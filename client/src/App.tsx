@@ -10,6 +10,7 @@ import {
   Tag, 
   ChevronLeft 
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
 
@@ -30,7 +31,7 @@ const INITIAL_NOTES: Note[] = [
     title: "Project Aether",
     content: "The goal is to create a seamless interface between the user's intent and the digital manifestation. \n\nKey pillars:\n- Minimality\n- Speed\n- Aesthetic depth\n\nNeed to research more on glassmorphism best practices for performance.",
     tags: ["design", "ideas"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
     updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 2,
   },
   {
@@ -38,7 +39,7 @@ const INITIAL_NOTES: Note[] = [
     title: "Dream Journal",
     content: "Walking through a city made of crystal. The light was refracting through the buildings, creating rainbows on the streets. I felt a sense of calm urgency.",
     tags: ["personal", "dreams"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5, // 5 days ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
     updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 5,
   },
   {
@@ -46,7 +47,7 @@ const INITIAL_NOTES: Note[] = [
     title: "Meeting Notes: Q1 Roadmap",
     content: "Attendees: Sarah, Mike, Alex.\n\n- Focus on stability first.\n- New feature rollout scheduled for March.\n- Need to hire 2 more frontend devs.",
     tags: ["work", "planning"],
-    createdAt: Date.now() - 1000 * 60 * 60 * 4, // 4 hours ago
+    createdAt: Date.now() - 1000 * 60 * 60 * 4,
     updatedAt: Date.now() - 1000 * 60 * 60 * 4,
   },
 ];
@@ -81,17 +82,32 @@ const Sidebar = ({
     <div className={`flex flex-col h-full ${className}`}>
       {/* Header */}
       <div className="p-6 pb-4">
-        <div className="flex items-center gap-2 mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex items-center gap-2 mb-6"
+        >
           <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
-            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            >
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+            </motion.div>
           </div>
           <h1 className="text-lg font-semibold tracking-tight text-neutral-100">
             Arcane Vault
           </h1>
-        </div>
+        </motion.div>
 
         {/* Search */}
-        <div className="relative group">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="relative group"
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-emerald-400/80 transition-colors duration-300" />
           <input
             type="text"
@@ -101,54 +117,70 @@ const Sidebar = ({
             className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-neutral-200 placeholder:text-neutral-600 focus:outline-hidden focus:bg-white/10 focus:border-emerald-500/30 focus:shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300"
             data-testid="input-search"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* Note List */}
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-3 scrollbar-hide">
-        {notes.length === 0 ? (
-          <div className="text-center py-10 text-neutral-600 text-sm">
-            No notes found.
-          </div>
-        ) : (
-          notes.map((note) => (
-            <button
-              key={note.id}
-              onClick={() => onSelect(note.id)}
-              className={`w-full text-left p-4 rounded-xl border transition-all duration-300 group relative overflow-hidden
-                ${
-                  selectedId === note.id
-                    ? "bg-white/10 border-emerald-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
-                    : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-emerald-500/20 hover:-translate-y-0.5"
-                }
-              `}
-              data-testid={`card-note-${note.id}`}
+        <AnimatePresence mode="popLayout">
+          {notes.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-10 text-neutral-600 text-sm"
             >
-              {selectedId === note.id && (
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              )}
-              
-              <h3 className={`font-medium mb-1 truncate ${selectedId === note.id ? "text-emerald-100" : "text-neutral-200 group-hover:text-white"}`}>
-                {note.title || "Untitled Note"}
-              </h3>
-              
-              <p className="text-xs text-neutral-500 line-clamp-2 mb-3 leading-relaxed">
-                {note.content || "No content..."}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-neutral-600 flex items-center gap-1">
-                  {format(note.updatedAt, "MMM d")}
-                </span>
-                <div className="flex gap-1">
-                  {note.tags.slice(0, 2).map(tag => (
-                    <span key={tag} className="w-1.5 h-1.5 rounded-full bg-emerald-500/30" />
-                  ))}
+              No notes found.
+            </motion.div>
+          ) : (
+            notes.map((note) => (
+              <motion.button
+                layout
+                key={note.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                whileHover={{ scale: 1.02, x: 4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onSelect(note.id)}
+                className={`w-full text-left p-4 rounded-xl border transition-colors duration-300 group relative overflow-hidden
+                  ${
+                    selectedId === note.id
+                      ? "bg-white/10 border-emerald-500/30 shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+                      : "bg-white/5 border-white/5 hover:bg-white/10 hover:border-emerald-500/20"
+                  }
+                `}
+                data-testid={`card-note-${note.id}`}
+              >
+                {selectedId === note.id && (
+                  <motion.div 
+                    layoutId="active-indicator"
+                    className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+                  />
+                )}
+                
+                <h3 className={`font-medium mb-1 truncate transition-colors duration-200 ${selectedId === note.id ? "text-emerald-100" : "text-neutral-200 group-hover:text-white"}`}>
+                  {note.title || "Untitled Note"}
+                </h3>
+                
+                <p className="text-xs text-neutral-500 line-clamp-2 mb-3 leading-relaxed">
+                  {note.content || "No content..."}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-neutral-600 flex items-center gap-1">
+                    {format(note.updatedAt, "MMM d")}
+                  </span>
+                  <div className="flex gap-1">
+                    {note.tags.slice(0, 2).map(tag => (
+                      <span key={tag} className="w-1.5 h-1.5 rounded-full bg-emerald-500/30" />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))
-        )}
+              </motion.button>
+            ))
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -197,7 +229,7 @@ function App() {
       setEditorTags("");
       setLastSaved(null);
     }
-  }, [selectedId, notes]); // Depend on notes to update if saved
+  }, [selectedId, notes]); 
 
   // Handlers
   const handleNewNote = () => {
@@ -271,7 +303,12 @@ function App() {
 
         {/* Editor Area */}
         <main className={`${!selectedId ? 'hidden md:flex' : 'flex'} flex-col flex-1 h-full min-w-0`}>
-          <div className="glass-panel w-full h-full rounded-none md:rounded-3xl flex flex-col relative overflow-hidden">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="glass-panel w-full h-full rounded-none md:rounded-3xl flex flex-col relative overflow-hidden"
+          >
             
             {/* Editor Toolbar */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
@@ -284,10 +321,15 @@ function App() {
                 </button>
                 <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium tracking-wide uppercase">
                    {lastSaved ? (
-                     <>
+                     <motion.div 
+                       initial={{ opacity: 0, y: 5 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       key={lastSaved}
+                       className="flex items-center gap-2"
+                     >
                       <Clock className="w-3 h-3" />
                       <span>Last saved {format(lastSaved, "h:mm a")}</span>
-                     </>
+                     </motion.div>
                    ) : (
                      <span>Unsaved Draft</span>
                    )}
@@ -295,76 +337,96 @@ function App() {
               </div>
               
               <div className="flex items-center gap-2">
-                {selectedId && (
-                  <button
-                    onClick={handleDelete}
-                    className="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                    title="Delete Note"
-                    data-testid="button-delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
+                <AnimatePresence>
+                  {selectedId && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleDelete}
+                      className="p-2 text-neutral-500 hover:text-red-400 rounded-lg transition-colors"
+                      title="Delete Note"
+                      data-testid="button-delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
                 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleNewNote}
-                  className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors border border-transparent hover:border-white/10"
+                  className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-white/10"
                   data-testid="button-new"
                 >
                   <Plus className="w-4 h-4" />
                   <span>New</span>
-                </button>
+                </motion.button>
 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(52, 211, 153, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-emerald-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg shadow-[0_0_15px_rgba(52,211,153,0.3)] hover:shadow-[0_0_20px_rgba(52,211,153,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-emerald-950 bg-emerald-400 rounded-lg shadow-[0_0_15px_rgba(52,211,153,0.3)] transition-all"
                   data-testid="button-save"
                 >
                   <Save className="w-4 h-4" />
                   <span>Save</span>
-                </button>
+                </motion.button>
               </div>
             </header>
 
             {/* Editor Content */}
             <div className="flex-1 overflow-y-auto">
-              <div className="max-w-3xl mx-auto px-6 py-10 md:py-16 space-y-8">
-                
-                {/* Title Input */}
-                <input
-                  type="text"
-                  value={editorTitle}
-                  onChange={(e) => setEditorTitle(e.target.value)}
-                  placeholder="Note Title"
-                  className="w-full bg-transparent text-3xl md:text-4xl font-bold text-neutral-100 placeholder:text-neutral-700 outline-hidden border-none p-0 tracking-tight"
-                  data-testid="input-title"
-                />
-
-                {/* Tags Input */}
-                <div className="flex items-center gap-3 text-neutral-500">
-                  <Tag className="w-4 h-4" />
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={selectedId || "new"}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-w-3xl mx-auto px-6 py-10 md:py-16 space-y-8"
+                >
+                  
+                  {/* Title Input */}
                   <input
                     type="text"
-                    value={editorTags}
-                    onChange={(e) => setEditorTags(e.target.value)}
-                    placeholder="Add tags (comma separated)..."
-                    className="flex-1 bg-transparent text-sm text-emerald-400 placeholder:text-neutral-700 outline-hidden border-none p-0"
-                    data-testid="input-tags"
+                    value={editorTitle}
+                    onChange={(e) => setEditorTitle(e.target.value)}
+                    placeholder="Note Title"
+                    className="w-full bg-transparent text-3xl md:text-4xl font-bold text-neutral-100 placeholder:text-neutral-700 outline-hidden border-none p-0 tracking-tight transition-all focus:text-white"
+                    data-testid="input-title"
                   />
-                </div>
 
-                {/* Content Textarea */}
-                <textarea
-                  value={editorContent}
-                  onChange={(e) => setEditorContent(e.target.value)}
-                  placeholder="Start writing..."
-                  className="w-full h-[60vh] bg-transparent text-lg leading-relaxed text-neutral-300 placeholder:text-neutral-700 outline-hidden border-none resize-none p-0 font-light"
-                  data-testid="textarea-content"
-                />
-              </div>
+                  {/* Tags Input */}
+                  <div className="flex items-center gap-3 text-neutral-500">
+                    <Tag className="w-4 h-4" />
+                    <input
+                      type="text"
+                      value={editorTags}
+                      onChange={(e) => setEditorTags(e.target.value)}
+                      placeholder="Add tags (comma separated)..."
+                      className="flex-1 bg-transparent text-sm text-emerald-400 placeholder:text-neutral-700 outline-hidden border-none p-0 focus:text-emerald-300 transition-colors"
+                      data-testid="input-tags"
+                    />
+                  </div>
+
+                  {/* Content Textarea */}
+                  <textarea
+                    value={editorContent}
+                    onChange={(e) => setEditorContent(e.target.value)}
+                    placeholder="Start writing..."
+                    className="w-full h-[60vh] bg-transparent text-lg leading-relaxed text-neutral-300 placeholder:text-neutral-700 outline-hidden border-none resize-none p-0 font-light focus:text-neutral-100 transition-colors"
+                    data-testid="textarea-content"
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
             
-          </div>
+          </motion.div>
         </main>
       </div>
     </div>
