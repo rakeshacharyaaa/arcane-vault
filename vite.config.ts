@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
@@ -11,6 +12,30 @@ export default defineConfig({
     runtimeErrorOverlay(),
     tailwindcss(),
     metaImagesPlugin(),
+    VitePWA({
+      registerType: "autoUpdate",
+      includeAssets: ["favicon.png"],
+      manifest: {
+        name: "Arcane Vault",
+        short_name: "ArcaneVault",
+        description: "A calm, magical, personal notes vault.",
+        theme_color: "#0a0a0a",
+        background_color: "#0a0a0a",
+        display: "standalone",
+        icons: [
+          {
+            src: "/favicon.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/favicon.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
     ...(process.env.NODE_ENV !== "production" &&
       process.env.REPL_ID !== undefined
       ? [
