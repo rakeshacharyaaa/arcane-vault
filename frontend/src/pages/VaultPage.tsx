@@ -8,21 +8,26 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function VaultPage() {
   const [match, params] = useRoute("/page/:id");
-  const { pages, addPage } = useStore();
+  const { pages, addPage, isLoading } = useStore();
   const [, setLocation] = useLocation();
 
-  // Redirect to first page if no page selected
+  // Redirect or create initial page
   useEffect(() => {
+    if (isLoading) return;
+
     if (!match && pages.length > 0) {
-        // Find the first root page or just first page
-        const firstPage = pages.find(p => !p.parentId) || pages[0];
-        setLocation(`/page/${firstPage.id}`);
+      // Find the first root page or just first page
+      const firstPage = pages.find(p => !p.parentId) || pages[0];
+      setLocation(`/page/${firstPage.id}`);
     } else if (pages.length === 0) {
-        // Create initial page if empty
-        const newId = addPage();
-        setLocation(`/page/${newId}`);
+      // Create initial page if empty
+      const createInitial = async () => {
+        const newId = await addPage();
+        if (newId) setLocation(`/page/${newId}`);
+      };
+      createInitial();
     }
-  }, [match, pages, addPage, setLocation]);
+  }, [match, pages, addPage, setLocation, isLoading]);
 
   const currentPageId = params?.id;
   const currentPage = pages.find(p => p.id === currentPageId);
@@ -40,25 +45,25 @@ export default function VaultPage() {
       {/* Mobile Sidebar Trigger */}
       <div className="md:hidden fixed top-4 left-4 z-50">
         <Sheet>
-            <SheetTrigger asChild>
-                <button className="p-2 bg-neutral-900 border border-white/10 rounded-lg text-neutral-400">
-                    <Menu className="w-5 h-5" />
-                </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 bg-neutral-950 border-r border-white/10">
-                <Sidebar className="w-full h-full" />
-            </SheetContent>
+          <SheetTrigger asChild>
+            <button className="p-2 bg-neutral-900 border border-white/10 rounded-lg text-neutral-400">
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-80 bg-neutral-950 border-r border-white/10">
+            <Sidebar className="w-full h-full" />
+          </SheetContent>
         </Sheet>
       </div>
 
       {/* Main Content */}
       <main className="flex-1 h-full overflow-y-auto relative z-0 scrollbar-hide">
         {currentPage ? (
-            <Editor key={currentPage.id} page={currentPage} />
+          <Editor key={currentPage.id} page={currentPage} />
         ) : (
-            <div className="flex items-center justify-center h-full text-neutral-500">
-                Select a page
-            </div>
+          <div className="flex items-center justify-center h-full text-neutral-500">
+            Select a page
+          </div>
         )}
       </main>
     </div>

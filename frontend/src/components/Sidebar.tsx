@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useStore, Page } from "@/lib/store";
-import { 
-  ChevronRight, 
-  ChevronDown, 
-  FileText, 
-  Plus, 
-  Search, 
-  MoreHorizontal, 
+import {
+  ChevronRight,
+  ChevronDown,
+  FileText,
+  Plus,
+  Search,
+  MoreHorizontal,
   Trash2,
   CornerDownRight
 } from "lucide-react";
@@ -27,19 +27,19 @@ const SidebarItem = ({ page, depth, onToggle, onAddPage, onDelete, isActive }: S
   const { pages } = useStore();
   const children = pages.filter(p => p.parentId === page.id).sort((a, b) => a.updatedAt - b.updatedAt);
   const hasChildren = children.length > 0;
-  
+
   return (
     <div className="select-none">
       <ContextMenu.Root>
         <ContextMenu.Trigger>
-          <div 
+          <div
             className={`
               group flex items-center gap-1 py-1 px-2 rounded-lg cursor-pointer transition-colors
               ${isActive ? "bg-emerald-500/10 text-emerald-100" : "text-neutral-400 hover:bg-white/5 hover:text-neutral-200"}
             `}
             style={{ paddingLeft: `${depth * 12 + 8}px` }}
           >
-            <button 
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 onToggle(page.id);
@@ -50,39 +50,37 @@ const SidebarItem = ({ page, depth, onToggle, onAddPage, onDelete, isActive }: S
                 <ChevronRight className="w-3 h-3" />
               </div>
             </button>
-            
-            <Link href={`/page/${page.id}`}>
-              <a className="flex-1 flex items-center gap-2 overflow-hidden py-1">
-                <span className="text-sm shrink-0">{page.icon || <FileText className="w-3.5 h-3.5" />}</span>
-                <span className="truncate text-sm font-medium">{page.title || "Untitled"}</span>
-              </a>
+
+            <Link href={`/page/${page.id}`} className="flex-1 flex items-center gap-2 overflow-hidden py-1">
+              <span className="text-sm shrink-0">{page.icon || <FileText className="w-3.5 h-3.5" />}</span>
+              <span className="truncate text-sm font-medium">{page.title || "Untitled"}</span>
             </Link>
 
             <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1">
-               <button 
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onAddPage(page.id);
-                 }}
-                 className="p-1 hover:bg-white/10 rounded"
-                 title="Add sub-page"
-               >
-                 <Plus className="w-3 h-3" />
-               </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddPage(page.id);
+                }}
+                className="p-1 hover:bg-white/10 rounded"
+                title="Add sub-page"
+              >
+                <Plus className="w-3 h-3" />
+              </button>
             </div>
           </div>
         </ContextMenu.Trigger>
 
         <ContextMenu.Portal>
           <ContextMenu.Content className="min-w-[160px] bg-[#1a1a1a] border border-white/10 rounded-lg p-1 shadow-xl text-sm text-neutral-300 z-50 animate-in fade-in zoom-in-95 duration-100">
-            <ContextMenu.Item 
+            <ContextMenu.Item
               className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/10 hover:text-white outline-none cursor-pointer"
               onSelect={() => onAddPage(page.id)}
             >
               <Plus className="w-4 h-4" /> New sub-page
             </ContextMenu.Item>
             <ContextMenu.Separator className="h-px bg-white/10 my-1" />
-            <ContextMenu.Item 
+            <ContextMenu.Item
               className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-red-500/20 hover:text-red-400 outline-none cursor-pointer text-red-500"
               onSelect={() => onDelete(page.id)}
             >
@@ -101,10 +99,10 @@ const SidebarItem = ({ page, depth, onToggle, onAddPage, onDelete, isActive }: S
             className="overflow-hidden"
           >
             {children.map(child => (
-              <SidebarItem 
-                key={child.id} 
-                page={child} 
-                depth={depth + 1} 
+              <SidebarItem
+                key={child.id}
+                page={child}
+                depth={depth + 1}
                 onToggle={onToggle}
                 onAddPage={onAddPage}
                 onDelete={onDelete}
@@ -124,18 +122,20 @@ export function Sidebar({ className }: { className?: string }) {
   const [search, setSearch] = useState("");
 
   const rootPages = pages.filter(p => !p.parentId).sort((a, b) => a.updatedAt - b.updatedAt);
-  
+
   // Flatten for search
   const searchedPages = pages.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
 
-  const handleAddPage = (parentId?: string) => {
-    const newId = addPage(parentId || null);
-    if (parentId) {
+  const handleAddPage = async (parentId?: string) => {
+    const newId = await addPage(parentId || null);
+    if (newId) {
+      if (parentId) {
         // Ensure parent is expanded
         const parent = pages.find(p => p.id === parentId);
         if (parent && !parent.isExpanded) togglePageExpand(parentId);
+      }
+      setLocation(`/page/${newId}`);
     }
-    setLocation(`/page/${newId}`);
   };
 
   const currentId = location.split('/page/')[1];
@@ -143,66 +143,64 @@ export function Sidebar({ className }: { className?: string }) {
   return (
     <div className={`flex flex-col h-full bg-neutral-950/50 border-r border-white/5 backdrop-blur-xl ${className}`}>
       <div className="p-4 space-y-4">
-         {/* User / Workspace Switcher Mock */}
-         <div className="flex items-center gap-2 px-2 py-1 hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
-            <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-black">A</div>
-            <span className="text-sm font-medium text-neutral-200">Arcane Vault</span>
-            <ChevronDown className="w-3 h-3 text-neutral-500 ml-auto" />
-         </div>
+        {/* User / Workspace Switcher Mock */}
+        <div className="flex items-center gap-2 px-2 py-1 hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
+          <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-black">A</div>
+          <span className="text-sm font-medium text-neutral-200">Arcane Vault</span>
+          <ChevronDown className="w-3 h-3 text-neutral-500 ml-auto" />
+        </div>
 
-         {/* Search & New Page */}
-         <div className="space-y-2">
-            <div className="relative group">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-500 group-focus-within:text-emerald-400" />
-                <input 
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search pages..."
-                    className="w-full bg-white/5 border border-white/10 rounded-md py-1.5 pl-8 pr-2 text-xs text-neutral-300 placeholder:text-neutral-600 focus:outline-hidden focus:bg-white/10 focus:border-emerald-500/30 transition-all"
-                />
-            </div>
-            
-            <button 
-                onClick={() => handleAddPage()}
-                className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-neutral-400 hover:text-white hover:bg-white/5 rounded-md transition-colors"
-            >
-                <Plus className="w-4 h-4" />
-                <span>New Page</span>
-            </button>
-         </div>
+        {/* Search & New Page */}
+        <div className="space-y-2">
+          <div className="relative group">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-500 group-focus-within:text-emerald-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search pages..."
+              className="w-full bg-white/5 border border-white/10 rounded-md py-1.5 pl-8 pr-2 text-xs text-neutral-300 placeholder:text-neutral-600 focus:outline-hidden focus:bg-white/10 focus:border-emerald-500/30 transition-all"
+            />
+          </div>
+
+          <button
+            onClick={() => handleAddPage()}
+            className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-neutral-400 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Page</span>
+          </button>
+        </div>
       </div>
 
       {/* Page Tree */}
       <div className="flex-1 overflow-y-auto px-2 pb-4 scrollbar-hide">
-         <div className="space-y-0.5">
-            {search ? (
-                // Search Results
-                searchedPages.map(page => (
-                    <Link key={page.id} href={`/page/${page.id}`}>
-                        <a className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-sm text-neutral-300">
-                            <span className="text-xs">{page.icon || <FileText className="w-3.5 h-3.5" />}</span>
-                            <span className="truncate">{page.title}</span>
-                            <span className="ml-auto text-xs text-neutral-600 truncate max-w-[80px]">
-                                {page.parentId ? "Sub-page" : "Page"}
-                            </span>
-                        </a>
-                    </Link>
-                ))
-            ) : (
-                // Tree View
-                rootPages.map(page => (
-                    <SidebarItem 
-                        key={page.id} 
-                        page={page} 
-                        depth={0} 
-                        onToggle={togglePageExpand}
-                        onAddPage={handleAddPage}
-                        onDelete={deletePage}
-                        isActive={currentId === page.id || pages.find(p => p.id === currentId)?.parentId === page.id} // Simple active check, technically should recurse
-                    />
-                ))
-            )}
-         </div>
+        <div className="space-y-0.5">
+          {search ? (
+            // Search Results
+            searchedPages.map(page => (
+              <Link key={page.id} href={`/page/${page.id}`} className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-sm text-neutral-300">
+                <span className="text-xs">{page.icon || <FileText className="w-3.5 h-3.5" />}</span>
+                <span className="truncate">{page.title}</span>
+                <span className="ml-auto text-xs text-neutral-600 truncate max-w-[80px]">
+                  {page.parentId ? "Sub-page" : "Page"}
+                </span>
+              </Link>
+            ))
+          ) : (
+            // Tree View
+            rootPages.map(page => (
+              <SidebarItem
+                key={page.id}
+                page={page}
+                depth={0}
+                onToggle={togglePageExpand}
+                onAddPage={handleAddPage}
+                onDelete={deletePage}
+                isActive={currentId === page.id || pages.find(p => p.id === currentId)?.parentId === page.id} // Simple active check, technically should recurse
+              />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

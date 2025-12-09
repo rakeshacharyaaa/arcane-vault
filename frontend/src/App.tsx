@@ -9,14 +9,48 @@ import VaultPage from "@/pages/VaultPage";
 import ProfilePage from "@/pages/ProfilePage";
 import NotFound from "@/pages/not-found";
 
+import { useEffect } from "react";
+import { useStore } from "@/lib/store";
+
+import { supabase } from "@/lib/supabase";
+
 function App() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { fetchPages, subscribeToPages, setUser, user } = useStore();
   const isAuthPage = location === "/auth";
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (!session?.user && !isAuthPage) {
+        setLocation("/auth");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (!session?.user) {
+        setLocation("/auth");
+      } else if (location === "/auth") {
+        setLocation("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setUser, setLocation, isAuthPage, location]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchPages();
+    const unsubscribe = subscribeToPages();
+    return () => { unsubscribe(); };
+  }, [user, fetchPages, subscribeToPages]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster />
-      
+
       <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-neutral-950 via-black to-neutral-900 text-neutral-200 font-sans">
         {/* Background Texture */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
@@ -29,6 +63,7 @@ function App() {
           <Switch>
             <Route path="/auth" component={AuthPage} />
             <Route path="/" component={VaultPage} />
+            <Route path="/page/:id" component={VaultPage} />
             <Route path="/profile" component={ProfilePage} />
             <Route component={NotFound} />
           </Switch>

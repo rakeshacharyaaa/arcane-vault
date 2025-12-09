@@ -6,7 +6,7 @@ import { useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ProfilePage() {
-  const { user, pages, logout } = useStore();
+  const { user, pages, signOut } = useStore();
   const [, setLocation] = useLocation();
 
   // Redirect if not logged in (mock protection)
@@ -20,10 +20,10 @@ export default function ProfilePage() {
   const totalPages = pages.length;
   // Approximating words from JSON content is hard, so let's just count blocks or raw text length
   const totalWords = pages.reduce((acc, page) => {
-      // Very rough approximation: JSON string length / 6
-      return acc + Math.floor(JSON.stringify(page.content).length / 6);
+    // Very rough approximation: JSON string length / 6
+    return acc + Math.floor(JSON.stringify(page.content).length / 6);
   }, 0);
-  
+
   const formattedWords = totalWords > 1000 ? `${(totalWords / 1000).toFixed(1)}k` : totalWords;
   const daysActive = user.joinDate ? formatDistanceToNow(user.joinDate, { addSuffix: false }) : "1 day";
 
@@ -34,16 +34,16 @@ export default function ProfilePage() {
   ];
 
   const handleLogout = () => {
-    logout();
+    signOut();
     setLocation("/auth");
   };
 
   return (
     <div className="flex h-full w-full overflow-hidden p-6 md:p-10 lg:p-12 overflow-y-auto">
       <div className="w-full max-w-4xl mx-auto space-y-8 pb-20">
-        
+
         {/* Profile Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="glass-panel p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
@@ -53,9 +53,7 @@ export default function ProfilePage() {
 
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-neutral-800 to-black border-2 border-white/10 flex items-center justify-center shadow-xl">
-              <span className="text-2xl font-bold text-neutral-300">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+              {(user?.name || user?.email || "?").charAt(0).toUpperCase()}
             </div>
             <div className="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 rounded-full border-4 border-black shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
@@ -108,7 +106,7 @@ export default function ProfilePage() {
           className="glass-panel p-8 rounded-3xl"
         >
           <h2 className="text-xl font-bold text-white mb-6">Account Settings</h2>
-          
+
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
               <div className="flex items-center gap-4">
@@ -121,7 +119,7 @@ export default function ProfilePage() {
               <button className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Change</button>
             </div>
 
-             <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
+            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
               <div className="flex items-center gap-4">
                 <Shield className="w-5 h-5 text-neutral-400" />
                 <div>

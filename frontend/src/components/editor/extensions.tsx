@@ -2,17 +2,17 @@ import { Extension } from '@tiptap/core';
 import Suggestion from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance } from 'tippy.js';
-import { 
-  Heading1, 
-  Heading2, 
-  Heading3, 
-  List, 
-  ListOrdered, 
-  CheckSquare, 
-  Quote, 
-  Code, 
+import {
+  Heading1,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  CheckSquare,
+  Quote,
+  Code,
   Image as ImageIcon,
-  Minus 
+  Minus
 } from 'lucide-react';
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
@@ -58,17 +58,17 @@ const CommandList = forwardRef<CommandListHandle, any>((props, ref) => {
       {props.items.map((item: any, index: number) => (
         <button
           key={index}
-          className={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-md text-left transition-colors ${
-            index === selectedIndex ? 'bg-emerald-500/20 text-emerald-100' : 'text-neutral-400 hover:bg-white/5'
-          }`}
+          className={`flex items-center gap-2 px-2 py-1.5 text-sm rounded-md text-left transition-colors w-full ${index === selectedIndex ? 'bg-emerald-500/20 text-emerald-100' : 'text-neutral-400 hover:bg-white/5'
+            }`}
+          style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
           onClick={() => selectItem(index)}
         >
-          <div className="p-1 rounded bg-white/5 border border-white/10 text-neutral-300">
-             {item.icon}
+          <div className="flex-shrink-0 p-1 rounded bg-white/5 border border-white/10 text-neutral-300">
+            {item.icon}
           </div>
-          <div className="flex flex-col">
-             <span className="font-medium text-neutral-200">{item.title}</span>
-             <span className="text-[10px] text-neutral-500">{item.description}</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="font-medium text-neutral-200 truncate">{item.title}</span>
+            <span className="text-[10px] text-neutral-500 truncate">{item.description}</span>
           </div>
         </button>
       ))}
