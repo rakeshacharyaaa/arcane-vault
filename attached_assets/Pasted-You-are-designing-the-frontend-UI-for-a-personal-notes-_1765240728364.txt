@@ -1,0 +1,104 @@
+You are designing the frontend UI for a personal notes app called **Arcane Vault**.
+
+Goal:
+Create a single-page React + TypeScript + Tailwind CSS UI with a **black-themed, glassmorphism, dark aesthetic**. No backend logic, just UI and basic state. The UI should feel like a calm, magical, personal vault.
+
+Tech:
+- React + TypeScript
+- Tailwind CSS (v4-compatible)
+- No Next.js-specific features (no app/router, no getServerSideProps, etc.)
+- Return a single root component (e.g. App.tsx) plus any child components if needed.
+
+Overall Layout:
+The layout is split into two main sections:
+
+1. Left Panel: “Vault Sidebar”
+   - Width ~ 25–30% on desktop, full width stacked on mobile.
+   - Contains:
+     - App logo / name at top: “Arcane Vault” with a small glowing dot icon.
+     - A search bar for notes.
+     - A scrollable list of note previews.
+   - Each note preview:
+     - Glassmorphism card:
+       - `bg-white/5`, `backdrop-blur-xl`
+       - `border border-white/10`
+       - soft `shadow-xl shadow-black/40`
+     - Shows:
+       - Note title
+       - 1–2 line snippet of content
+       - Created date in small text
+       - Tags as small pill chips (`bg-white/10`, `text-xs`, `rounded-full`, `border border-white/10`)
+     - Hover: subtle lift + glow (`hover:bg-white/10`, `hover:border-emerald-400/60`).
+     - Selected note: stronger border + subtle inner glow.
+
+2. Right Panel: “Editor”
+   - Takes remaining width on desktop, full width below sidebar on mobile.
+   - Glassmorphism editor card in the center:
+     - `bg-white/5`, `backdrop-blur-2xl`, `rounded-2xl`, `border border-white/10`, `shadow-2xl shadow-black/50`
+     - Padding and breathing room.
+   - Contains:
+     - Title input (large, subtle underline or border, full width).
+     - Multiline textarea for note content (flex-1, auto-resizing or large height).
+     - Tags input: single input where user types comma-separated tags.
+     - At the top-right or bottom-right:
+       - “New note” button (to clear form for a fresh note).
+       - “Save” button (primary, glowing emerald accent).
+       - Optional “Delete” button when a note is selected (accented in red).
+   - Small text indicator like “Last updated just now” or “Auto-saved” at bottom.
+
+Design & Styling Requirements:
+- Background:
+  - Full-screen, vertical gradient from near-black to slightly lighter black.
+  - Example: `from-neutral-950 via-black to-neutral-900`.
+- Typography:
+  - Use Tailwind’s default sans but style it to feel elegant:
+    - `font-sans`, `tracking-tight`, `antialiased`.
+- Glassmorphism:
+  - Consistent use of `bg-white/5`, `bg-white/10`, `backdrop-blur-md` to `backdrop-blur-2xl`.
+  - Borders: `border-white/10`, `border-white/5` where appropriate.
+  - Shadows: `shadow-lg shadow-black/40`.
+- Accent color:
+  - Emerald / teal glow: `text-emerald-400`, `border-emerald-400/60`, `shadow-emerald-500/40`.
+- Micro-interactions:
+  - Use Tailwind transitions:
+    - `transition`, `duration-200`, `ease-out`.
+  - Hover states for buttons and cards:
+    - Slight scale, slight glow, subtle color shift.
+- Overall feel:
+  - Calm, minimal, magical.
+  - No harsh borders, no sharp contrasting colors other than accents.
+  - Avoid clutter, keep things clean and focused.
+
+State & Mock Data:
+- Use React state only on the client.
+- Create a mock array of notes in code with:
+  - id, title, content, tags, createdAt.
+- Allow:
+  - Clicking a note in the sidebar selects it and populates the editor.
+  - “New note” clears the editor fields to create a new note.
+  - “Save” updates the selected note in local state or adds a new note if none is selected.
+  - “Delete” removes the selected note from the list.
+- Search:
+  - Typing in the search bar filters the notes list by title or content (case-insensitive).
+
+Responsiveness:
+- On desktop: Sidebar on left, editor on right, horizontally side-by-side.
+- On tablet/mobile: Stack vertically (sidebar on top, editor below).
+- Use Tailwind responsive classes (`md:`, `lg:`) to handle layout changes.
+
+Structure:
+- You can create small components like:
+  - `<Sidebar />`
+  - `<NoteList />`
+  - `<NoteListItem />`
+  - `<Editor />`
+  - `<TagChip />`
+- But keep everything in a simple structure so it’s easy to drop into a Vite + React + Tailwind project.
+
+Important:
+- Do NOT add any external UI libraries.
+- Do NOT include any backend calls or API logic.
+- Focus 100% on UI and local mock state with TypeScript types.
+- The result should look like a polished, production-ready dark glassmorphism notes app called Arcane Vault.
+
+Return only the relevant React + TypeScript + Tailwind code (components and any styles) in a way that I can easily copy into a Vite + React + Tailwind project.
