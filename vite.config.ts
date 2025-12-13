@@ -35,6 +35,9 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 4194304 // 4MB
+      }
     }),
     ...(process.env.NODE_ENV !== "production" &&
       process.env.REPL_ID !== undefined
