@@ -66,8 +66,8 @@ function App() {
           }}
         />
 
-        {/* Background Texture */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
+        {/* Background Texture Overlay */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none z-0 mix-blend-overlay"></div>
 
         {/* Global Navigation - Only show if not on auth page */}
         {!isAuthPage && <Navigation />}

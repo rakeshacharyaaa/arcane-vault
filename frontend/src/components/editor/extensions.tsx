@@ -225,7 +225,8 @@ export const getSuggestionItems = ({ query }: { query: string }) => {
       description: 'Big red heading',
       icon: <Palette className="w-4 h-4 text-red-500" />,
       command: ({ editor, range }: any) => {
-        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#ef4444').run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+        editor.chain().setColor('#ef4444').run();
       },
     },
     {
@@ -233,7 +234,8 @@ export const getSuggestionItems = ({ query }: { query: string }) => {
       description: 'Big blue heading',
       icon: <Palette className="w-4 h-4 text-blue-500" />,
       command: ({ editor, range }: any) => {
-        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#3b82f6').run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+        editor.chain().setColor('#3b82f6').run();
       },
     },
     {
@@ -241,7 +243,8 @@ export const getSuggestionItems = ({ query }: { query: string }) => {
       description: 'Big green heading',
       icon: <Palette className="w-4 h-4 text-green-500" />,
       command: ({ editor, range }: any) => {
-        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#22c55e').run();
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run();
+        editor.chain().setColor('#22c55e').run();
       },
     },
   ].filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));
