@@ -1,7 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Book, User, LogOut, Sparkles } from "lucide-react";
+import { Book, User, LogOut, Sparkles, Menu } from "lucide-react";
 import { motion } from "framer-motion";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sidebar } from "@/components/Sidebar";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -23,6 +25,23 @@ export function Navigation() {
 
       {/* Links */}
       <div className="flex md:flex-col items-center justify-around w-full md:w-auto md:gap-8 p-4 md:p-0">
+
+        {/* Mobile Menu Trigger */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="relative group p-3 flex flex-col items-center gap-1 text-neutral-500 hover:text-neutral-300">
+                <Menu className="w-6 h-6" />
+                <span className="text-[10px] font-medium">Menu</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-80 liquid-glass border-r-0">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <Sidebar className="w-full h-full" />
+            </SheetContent>
+          </Sheet>
+        </div>
+
         {links.map((link) => {
           const isActive = location === link.href;
           return (

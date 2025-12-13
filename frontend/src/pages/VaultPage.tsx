@@ -40,20 +40,6 @@ export default function VaultPage() {
         <Sidebar className="w-full h-full" />
       </aside>
 
-      {/* Mobile Sidebar Trigger */}
-      <div className="hidden fixed top-4 left-4 z-50">
-        <Sheet>
-          <SheetTrigger asChild>
-            <button className="p-2 bg-neutral-900 border border-white/10 rounded-lg text-neutral-400">
-              <Menu className="w-5 h-5" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-80 liquid-glass border-r-0">
-            <Sidebar className="w-full h-full" />
-          </SheetContent>
-        </Sheet>
-      </div>
-
       {/* Main Content */}
       <main className="flex-1 h-full overflow-y-scroll relative z-0">
 
