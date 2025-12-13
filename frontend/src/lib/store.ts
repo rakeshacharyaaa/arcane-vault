@@ -43,7 +43,7 @@ interface AppState {
   subscribeToPages: () => () => void;
 
   addPage: (parentId?: string | null) => Promise<string | null>;
-  updatePage: (id: string, updates: Partial<Page>) => Promise<void>;
+  updatePage: (id: string, updates: Partial<Page>, persist?: boolean) => Promise<void>;
   deletePage: (id: string) => Promise<void>;
   togglePageExpand: (id: string) => Promise<void>;
 }
@@ -89,6 +89,33 @@ export const useStore = create<AppState>((set, get) => ({
 
   fetchPages: async () => {
     set({ isLoading: true });
+
+    // DEV MODE BYPASS
+    if (get().user?.id === 'dev-user') {
+      // Return a dummy page if none exist, or keep existing
+      if (get().pages.length === 0) {
+        const dummyPage: Page = {
+          id: 'dev-page-1',
+          title: 'Dev Page',
+          icon: '🛠️',
+          coverImage: null,
+          content: {
+            type: 'doc', content: [
+              { type: 'paragraph', content: [{ type: 'text', text: 'Welcome to Dev Mode. content allows testing editor behavior.' }] }
+            ]
+          },
+          tags: ['dev'],
+          parentId: null,
+          isExpanded: true,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+        set({ pages: [dummyPage] });
+      }
+      set({ isLoading: false });
+      return;
+    }
+
     const { data, error } = await supabase
       .from('pages')
       .select('*')
@@ -104,6 +131,8 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   subscribeToPages: () => {
+    if (get().user?.id === 'dev-user') return () => { };
+
     const channel = supabase
       .channel('public:pages')
       .on(
@@ -133,6 +162,23 @@ export const useStore = create<AppState>((set, get) => ({
     const user = get().user;
     if (!user) return null;
 
+    if (user.id === 'dev-user') {
+      const newPage: Page = {
+        id: `dev-page-${Date.now()}`,
+        title: "Untitled Dev Page",
+        content: { type: 'doc', content: [] },
+        tags: [],
+        icon: null,
+        coverImage: null,
+        parentId: parentId,
+        isExpanded: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      };
+      set(state => ({ pages: [newPage, ...state.pages] }));
+      return newPage.id;
+    }
+
     const newPage = {
       title: "Untitled",
       content: { type: 'doc', content: [] },
@@ -157,11 +203,15 @@ export const useStore = create<AppState>((set, get) => ({
     return data.id;
   },
 
-  updatePage: async (id, updates) => {
+  updatePage: async (id, updates, persist = true) => {
     // Optimistic update
     set(state => ({
       pages: state.pages.map(p => p.id === id ? { ...p, ...updates } : p)
     }));
+
+    if (get().user?.id === 'dev-user') return;
+
+    if (!persist) return;
 
     // Map updates to snake_case
     const dbUpdates: any = { ...updates, updated_at: Date.now() };
@@ -193,6 +243,8 @@ export const useStore = create<AppState>((set, get) => ({
     set(state => ({
       pages: state.pages.filter(p => p.id !== id)
     }));
+
+    if (get().user?.id === 'dev-user') return;
 
     const { error } = await supabase
       .from('pages')

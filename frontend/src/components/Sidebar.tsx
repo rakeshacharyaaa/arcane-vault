@@ -141,7 +141,7 @@ export function Sidebar({ className }: { className?: string }) {
   const currentId = location.split('/page/')[1];
 
   return (
-    <div className={`flex flex-col h-full bg-neutral-950/50 border-r border-white/5 backdrop-blur-xl ${className}`}>
+    <div className={`flex flex-col h-full liquid-glass border-r-0 ${className}`}>
       <div className="p-4 space-y-4">
         {/* User / Workspace Switcher Mock */}
         <div className="flex items-center gap-2 px-2 py-1 hover:bg-white/5 rounded-lg cursor-pointer transition-colors">

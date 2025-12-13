@@ -33,9 +33,7 @@ export default function VaultPage() {
   const currentPage = pages.find(p => p.id === currentPageId);
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#0a0a0a] text-neutral-200 font-sans">
-      {/* Texture Overlay */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
+    <div className="flex h-screen w-full overflow-hidden text-neutral-200 font-sans">
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 lg:w-72 shrink-0 z-10 h-full">
@@ -43,21 +41,22 @@ export default function VaultPage() {
       </aside>
 
       {/* Mobile Sidebar Trigger */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="hidden fixed top-4 left-4 z-50">
         <Sheet>
           <SheetTrigger asChild>
             <button className="p-2 bg-neutral-900 border border-white/10 rounded-lg text-neutral-400">
               <Menu className="w-5 h-5" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-80 bg-neutral-950 border-r border-white/10">
+          <SheetContent side="left" className="p-0 w-80 liquid-glass border-r-0">
             <Sidebar className="w-full h-full" />
           </SheetContent>
         </Sheet>
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 h-full overflow-y-auto relative z-0 scrollbar-hide">
+      <main className="flex-1 h-full overflow-y-scroll relative z-0">
+
         {currentPage ? (
           <Editor key={currentPage.id} page={currentPage} />
         ) : (

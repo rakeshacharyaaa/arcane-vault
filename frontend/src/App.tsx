@@ -22,6 +22,8 @@ function App() {
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (useStore.getState().user?.id === 'dev-user') return;
+
       setUser(session?.user ?? null);
       if (!session?.user && !isAuthPage) {
         setLocation("/auth");
@@ -29,6 +31,7 @@ function App() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (useStore.getState().user?.id === 'dev-user') return;
       setUser(session?.user ?? null);
       if (!session?.user) {
         setLocation("/auth");
@@ -51,7 +54,18 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Toaster />
 
-      <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-neutral-950 via-black to-neutral-900 text-neutral-200 font-sans">
+      <div className="flex h-screen w-full overflow-hidden bg-black text-neutral-200 font-sans relative">
+        {/* Global Mesh Gradient Background */}
+        <div
+          className="absolute inset-0 z-0 opacity-40 pointer-events-none"
+          style={{
+            backgroundImage: `url('/image-mesh-gradient2.png')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+
         {/* Background Texture */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0 mix-blend-overlay"></div>
 

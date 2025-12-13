@@ -1,31 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, Shield, BarChart2, Calendar, Edit2, LogOut } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
+import { ActivityCalendar } from 'react-activity-calendar';
+import { getUserProfile, updateUserProfile } from "@/lib/api";
 
 export default function ProfilePage() {
-  const { user, pages, signOut } = useStore();
+  const { user, pages, signOut, setUser } = useStore();
   const [, setLocation] = useLocation();
+  const [isEditingAvatar, setIsEditingAvatar] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
 
-  // Redirect if not logged in (mock protection)
-  if (!user) {
-    // In a real app we'd redirect, but for now let's show empty state or redirect
-    setTimeout(() => setLocation("/auth"), 0);
-    return null;
-  }
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      setTimeout(() => setLocation("/auth"), 0);
+    } else {
+      // Fetch extended profile data
+      getUserProfile(user.email).then(setProfileData).catch(console.error);
+    }
+  }, [user, setLocation]);
+
+  if (!user) return null;
 
   // Calculate Stats
   const totalPages = pages.length;
-  // Approximating words from JSON content is hard, so let's just count blocks or raw text length
   const totalWords = pages.reduce((acc, page) => {
-    // Very rough approximation: JSON string length / 6
     return acc + Math.floor(JSON.stringify(page.content).length / 6);
   }, 0);
 
   const formattedWords = totalWords > 1000 ? `${(totalWords / 1000).toFixed(1)}k` : totalWords;
-  const daysActive = user.joinDate ? formatDistanceToNow(user.joinDate, { addSuffix: false }) : "1 day";
+  const daysActive = user.created_at ? formatDistanceToNow(new Date(user.created_at), { addSuffix: false }) : "1 day";
 
   const stats = [
     { label: "Total Pages", value: totalPages.toString(), icon: BarChart2 },
@@ -38,31 +45,86 @@ export default function ProfilePage() {
     setLocation("/auth");
   };
 
+  const activityData = pages.map(page => ({
+    date: new Date(page.updatedAt).toISOString().split('T')[0],
+    count: 1,
+    level: 1
+  }));
+
+  const avatars = [
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Garfield",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Ginger",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Missy"
+  ];
+
+  const updateAvatar = async (url: string) => {
+    try {
+      await updateUserProfile(user.email, { avatarUrl: url });
+      setProfileData({ ...profileData, avatarUrl: url });
+      setIsEditingAvatar(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggle2FA = async () => {
+    try {
+      const newState = !profileData?.isTwoFactorEnabled;
+      await updateUserProfile(user.email, { isTwoFactorEnabled: newState });
+      setProfileData({ ...profileData, isTwoFactorEnabled: newState });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
-    <div className="flex h-full w-full overflow-hidden p-6 md:p-10 lg:p-12 overflow-y-auto">
-      <div className="w-full max-w-4xl mx-auto space-y-8 pb-20">
+    <div className="flex h-full w-full overflow-hidden relative overflow-y-auto">
+
+
+      <div className="w-full max-w-4xl mx-auto space-y-8 pb-20 p-6 md:p-10 lg:p-12 relative z-10">
 
         {/* Profile Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
+          className="liquid-glass p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
         >
           {/* Background Glow */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-neutral-800 to-black border-2 border-white/10 flex items-center justify-center shadow-xl">
-              {(user?.name || user?.email || "?").charAt(0).toUpperCase()}
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-neutral-800 to-black border-2 border-white/10 flex items-center justify-center shadow-xl overflow-hidden cursor-pointer" onClick={() => setIsEditingAvatar(true)}>
+              {profileData?.avatarUrl ? (
+                <img src={profileData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl font-bold text-white">{(user?.email || "?").charAt(0).toUpperCase()}</span>
+              )}
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <Edit2 className="w-5 h-5 text-white" />
+              </div>
             </div>
             <div className="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 rounded-full border-4 border-black shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
           </div>
 
+          {isEditingAvatar && (
+            <div className="absolute top-full left-0 mt-4 p-4 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 flex gap-2 flex-wrap max-w-xs">
+              {avatars.map(url => (
+                <button key={url} onClick={() => updateAvatar(url)} className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 ring-emerald-500 transition-all">
+                  <img src={url} alt="Avatar option" className="w-full h-full" />
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-bold text-white mb-2">{user.name}</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">{user.email?.split('@')[0]}</h1>
             <p className="text-neutral-500 flex items-center justify-center md:justify-start gap-2">
               <Shield className="w-4 h-4 text-emerald-400" />
-              {user.isPremium ? "Premium Vault Member" : "Vault Member"}
+              {profileData?.isPremium ? "Premium Vault Member" : "Vault Member"}
             </p>
           </div>
 
@@ -85,7 +147,7 @@ export default function ProfilePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 + 0.2 }}
-              className="glass-card p-6 rounded-2xl flex items-center gap-4 hover:border-emerald-500/30 group"
+              className="liquid-glass p-6 rounded-2xl flex items-center gap-4 hover:border-emerald-500/30 group"
             >
               <div className="w-12 h-12 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/10 transition-colors">
                 <stat.icon className="w-6 h-6 text-emerald-400" />
@@ -98,12 +160,50 @@ export default function ProfilePage() {
           ))}
         </div>
 
+        {/* Heatmap Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="liquid-glass p-8 rounded-3xl"
+        >
+          <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+            <BarChart2 className="w-5 h-5 text-emerald-500" />
+            Activity Heatmap
+          </h2>
+          <div className="w-full overflow-x-auto pb-2">
+            <ActivityCalendar
+              data={activityData}
+              theme={{
+                light: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                dark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+              }}
+              labels={{
+                legend: {
+                  less: 'Less',
+                  more: 'More',
+                },
+                months: [
+                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                ],
+                totalCount: '{{count}} activities in {{year}}',
+                weekdays: [
+                  'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+                ]
+              }}
+              colorScheme="dark"
+              maxLevel={4}
+            />
+          </div>
+        </motion.div>
+
         {/* Settings Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="glass-panel p-8 rounded-3xl"
+          className="liquid-glass p-8 rounded-3xl"
         >
           <h2 className="text-xl font-bold text-white mb-6">Account Settings</h2>
 
@@ -124,10 +224,14 @@ export default function ProfilePage() {
                 <Shield className="w-5 h-5 text-neutral-400" />
                 <div>
                   <div className="text-sm font-medium text-white">Security</div>
-                  <div className="text-xs text-neutral-500">Two-factor authentication enabled</div>
+                  <div className="text-xs text-neutral-500">
+                    {profileData?.isTwoFactorEnabled ? "Two-factor authentication enabled" : "Two-factor authentication disabled"}
+                  </div>
                 </div>
               </div>
-              <button className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Manage</button>
+              <button onClick={toggle2FA} className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">
+                {profileData?.isTwoFactorEnabled ? "Disable" : "Enable"}
+              </button>
             </div>
           </div>
         </motion.div>

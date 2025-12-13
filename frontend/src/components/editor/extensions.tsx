@@ -12,9 +12,17 @@ import {
   Quote,
   Code,
   Image as ImageIcon,
-  Minus
+  Minus,
+  Paperclip,
+  Workflow,
+  Palette
 } from 'lucide-react';
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { FlowchartExtension } from './FlowchartExtension';
+import { FileExtension } from './FileExtension';
+import { Color } from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { uploadFile } from '@/lib/api';
 
 // Define the handle interface
 export interface CommandListHandle {
@@ -172,6 +180,68 @@ export const getSuggestionItems = ({ query }: { query: string }) => {
       icon: <Minus className="w-4 h-4" />,
       command: ({ editor, range }: any) => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+      },
+    },
+    {
+      title: 'Flowchart',
+      description: 'Create a diagram',
+      icon: <Workflow className="w-4 h-4" />,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).insertContent({ type: 'flowchart' }).run();
+      },
+    },
+    {
+      title: 'Attach File',
+      description: 'Upload a file',
+      icon: <Paperclip className="w-4 h-4" />,
+      command: async ({ editor, range }: any) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = async () => {
+          if (input.files?.length) {
+            const file = input.files[0];
+            try {
+              const { url } = await uploadFile(file);
+              editor.chain().focus().deleteRange(range).insertContent({
+                type: 'fileAttachment',
+                attrs: {
+                  src: url,
+                  title: file.name,
+                  size: (file.size / 1024).toFixed(1) + ' KB'
+                }
+              }).run();
+            } catch (e) {
+              console.error(e);
+              // In real app, show toast
+            }
+          }
+        };
+        input.click();
+      },
+    },
+    // Colored Headers
+    {
+      title: 'Red Heading',
+      description: 'Big red heading',
+      icon: <Palette className="w-4 h-4 text-red-500" />,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#ef4444').run();
+      },
+    },
+    {
+      title: 'Blue Heading',
+      description: 'Big blue heading',
+      icon: <Palette className="w-4 h-4 text-blue-500" />,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#3b82f6').run();
+      },
+    },
+    {
+      title: 'Green Heading',
+      description: 'Big green heading',
+      icon: <Palette className="w-4 h-4 text-green-500" />,
+      command: ({ editor, range }: any) => {
+        editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).setColor('#22c55e').run();
       },
     },
   ].filter((item) => item.title.toLowerCase().includes(query.toLowerCase()));

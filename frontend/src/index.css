@@ -592,12 +592,40 @@
     color: inherit !important;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  /* Custom Scrollbar for Dark Theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
 
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #444;
+  }
+
+  /* Ensure the class handles still exist if used elsewhere, but simply do nothing or use custom rules */
   .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    /* Intentionally left empty to disable hiding logic if it was causing issues */
+  }
+
+  /* Liquid Glass Effect (iPhone-like) */
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      inset 0 0 20px rgba(255, 255, 255, 0.05);
+    /* Inner glow */
   }
 }

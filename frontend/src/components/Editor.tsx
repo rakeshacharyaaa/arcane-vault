@@ -8,6 +8,10 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Typography from "@tiptap/extension-typography";
 import { common, createLowlight } from "lowlight";
 import { Commands, getSuggestionItems, renderItems } from "./editor/extensions";
+import { FileExtension } from "./editor/FileExtension";
+import { FlowchartExtension } from "./editor/FlowchartExtension";
+import { Color } from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import {
   Smile,
@@ -38,13 +42,13 @@ export function Editor({ page }: EditorProps) {
     }, [callback, delay]);
   };
 
-  const debouncedUpdatePage = useDebouncedCallback((id: string, content: any) => {
-    updatePage(id, { content });
+  const debouncedSave = useDebouncedCallback((id: string, updates: any) => {
+    // This call persists to DB
+    updatePage(id, updates, true);
   }, 1000);
 
   const updateContent = (content: any) => {
-    // Only update DB after delay
-    debouncedUpdatePage(page.id, content);
+    debouncedSave(page.id, { content });
   };
 
   const editor = useEditor({
@@ -53,7 +57,7 @@ export function Editor({ page }: EditorProps) {
         heading: {
           levels: [1, 2, 3],
         },
-        codeBlock: false, // Disable built-in CodeBlock to use CodeBlockLowlight
+        codeBlock: false,
       }),
       Placeholder.configure({
         placeholder: 'Type "/" for commands...',
@@ -66,6 +70,11 @@ export function Editor({ page }: EditorProps) {
         lowlight,
       }),
       Typography,
+      // New Extensions
+      FileExtension,
+      FlowchartExtension,
+      TextStyle,
+      Color,
       Commands.configure({
         suggestion: {
           items: getSuggestionItems,
@@ -82,10 +91,7 @@ export function Editor({ page }: EditorProps) {
         class: 'max-w-none focus:outline-none min-h-[50vh]',
       },
     },
-  }, [page.id]); // Re-create editor when page ID changes
-
-  // Update editor content if page changes externally (though we rely on key prop in parent usually)
-  // But here we rely on the dependency array of useEditor to reset it when page.id changes.
+  }, [page.id]);
 
   const addTag = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && tagInput.trim()) {
@@ -104,7 +110,7 @@ export function Editor({ page }: EditorProps) {
   // Local state for title to prevent typing lag
   const [title, setTitle] = useState(page.title);
 
-  // Sync title from props if ID changes or if substantial change (optional, but mainly ID)
+  // Sync title from props if ID changes
   useEffect(() => {
     setTitle(page.title);
   }, [page.id]);
@@ -112,12 +118,16 @@ export function Editor({ page }: EditorProps) {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    debouncedUpdatePage(page.id, { title: newTitle });
+
+    // Immediate Store Update (UI responsiveness) - Skip DB
+    updatePage(page.id, { title: newTitle }, false);
+
+    // Debounced DB Save
+    debouncedSave(page.id, { title: newTitle });
   };
 
-
   return (
-    <div className="w-full max-w-4xl mx-auto px-8 py-12 pb-32">
+    <div className="w-full max-w-4xl mx-auto px-4 md:px-8 py-6 md:py-12 pb-32">
       {/* Cover Image Placeholder (Visual only for now) */}
       <div className="group relative w-full h-40 bg-gradient-to-r from-emerald-900/20 to-neutral-900/20 rounded-t-3xl border-x border-t border-white/5 mb-8 -mt-12 overflow-hidden hidden">
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -134,7 +144,7 @@ export function Editor({ page }: EditorProps) {
             <button
               ref={emojiButtonRef}
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="w-16 h-16 flex items-center justify-center text-4xl hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
+              className="w-12 h-12 md:w-16 md:h-16 flex items-center justify-center text-3xl md:text-4xl hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
             >
               {page.icon || <Smile className="w-8 h-8 text-neutral-600" />}
             </button>
@@ -162,7 +172,7 @@ export function Editor({ page }: EditorProps) {
             value={title}
             onChange={handleTitleChange}
             placeholder="Untitled Page"
-            className="flex-1 bg-transparent text-4xl font-bold text-white placeholder:text-neutral-700 outline-none border-none p-0"
+            className="flex-1 bg-transparent text-3xl md:text-5xl font-bold text-white placeholder:text-neutral-700 outline-none border-none p-0 min-w-0"
           />
         </div>
 
@@ -188,7 +198,7 @@ export function Editor({ page }: EditorProps) {
       <div className="h-px w-full bg-white/5 mb-8" />
 
       {/* TipTap Editor */}
-      <div className="editor-wrapper min-h-[500px]">
+      <div className="editor-wrapper min-h-[500px] liquid-glass rounded-3xl p-6 md:p-12 mb-20">
         <EditorContent editor={editor} />
       </div>
     </div>
