@@ -15,7 +15,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static bg-neutral-900/90 backdrop-blur-xl border border-emerald-500/20 rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8 md:shadow-none shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static bg-black/90 backdrop-blur-xl border border-emerald-500/20 rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8 md:shadow-none shadow-[0_4px_30px_rgba(0,0,0,0.5)] bg-[radial-gradient(circle_at_bottom,rgba(16,185,129,0.15),transparent_70%)] md:bg-none">
 
       {/* Logo Area */}
       <div className="hidden md:flex flex-col items-center gap-4">
