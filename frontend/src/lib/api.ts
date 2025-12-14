@@ -48,3 +48,39 @@ export async function verify2FA(email: string, otp: string) {
     if (!res.ok) throw new Error("Verification failed");
     return res.json();
 }
+
+// --- Page API ---
+
+export async function fetchUserPages(email: string) {
+    const res = await fetch(`${API_BASE}/user/${email}/pages`);
+    if (!res.ok) throw new Error("Failed to fetch pages");
+    return res.json();
+}
+
+export async function createPage(email: string, page: any) {
+    const res = await fetch(`${API_BASE}/user/${email}/pages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(page),
+    });
+    if (!res.ok) throw new Error("Failed to create page");
+    return res.json();
+}
+
+export async function updatePage(id: string, updates: any) {
+    const res = await fetch(`${API_BASE}/pages/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error("Failed to update page");
+    return res.json();
+}
+
+export async function deletePage(id: string) {
+    const res = await fetch(`${API_BASE}/pages/${id}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete page");
+    return true;
+}

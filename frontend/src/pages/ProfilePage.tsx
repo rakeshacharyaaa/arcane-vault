@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { User, Mail, Shield, BarChart2, Calendar, Edit2, LogOut } from "lucide-react";
+import { User, Mail, Shield, BarChart2, Calendar, Edit2, LogOut, Check, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useLocation } from "wouter";
 import { formatDistanceToNow } from "date-fns";
 import { ActivityCalendar } from 'react-activity-calendar';
-import { getUserProfile, updateUserProfile } from "@/lib/api";
+import { getUserProfile, updateUserProfile, send2FA } from "@/lib/api";
+import { OTPModal } from "@/components/OTPModal";
+import { EmailChangeModal } from "@/components/EmailChangeModal";
 
 export default function ProfilePage() {
   const { user, pages, signOut, setUser } = useStore();
   const [, setLocation] = useLocation();
   const [isEditingAvatar, setIsEditingAvatar] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'enable2fa' | 'disable2fa' | null>(null);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -45,11 +50,21 @@ export default function ProfilePage() {
     setLocation("/auth");
   };
 
-  const activityData = pages.map(page => ({
-    date: new Date(page.updatedAt).toISOString().split('T')[0],
-    count: 1,
-    level: 1
-  }));
+  const activityData = pages.map(page => {
+    let dateStr = new Date().toISOString().split('T')[0]; // Default to today
+    try {
+      if (page.updatedAt) {
+        dateStr = new Date(page.updatedAt).toISOString().split('T')[0];
+      }
+    } catch (e) {
+      console.warn("Invalid date for page:", page.id, page.updatedAt);
+    }
+    return {
+      date: dateStr,
+      count: 1,
+      level: 1
+    };
+  });
 
   const avatars = [
     "https://api.dicebear.com/9.x/avataaars/svg?seed=Leo&backgroundColor=022c22&clothingColor=10b981&accessoriesColor=34d399",
@@ -61,6 +76,9 @@ export default function ProfilePage() {
     "https://api.dicebear.com/9.x/avataaars/svg?seed=Jace&backgroundColor=022c22&clothingColor=6ee7b7&accessoriesColor=34d399",
     "https://api.dicebear.com/9.x/avataaars/svg?seed=Lily&backgroundColor=064e3b&clothingColor=10b981&accessoriesColor=34d399"
   ];
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState("");
 
   const updateAvatar = async (url: string) => {
     try {
@@ -74,21 +92,86 @@ export default function ProfilePage() {
     }
   };
 
-  const toggle2FA = async () => {
+  const updateName = async () => {
     try {
-      const newState = !profileData?.isTwoFactorEnabled;
-      await updateUserProfile(user.email, { isTwoFactorEnabled: newState });
-      setProfileData({ ...profileData, isTwoFactorEnabled: newState });
+      await updateUserProfile(user.email, { name: nameInput });
+      setProfileData({ ...profileData, name: nameInput });
+      setIsEditingName(false);
     } catch (e) {
-      console.error(e);
+      console.error("Failed to update name:", e);
     }
+  };
+
+
+  // Generate full year of data for GitHub-style heatmap
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+  const heatmapData = [];
+  let currentDate = new Date(oneYearAgo);
+
+  while (currentDate <= today) {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    heatmapData.push({
+      date: dateStr,
+      count: 0,
+      level: 0
+    });
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Merge actual activity
+  const activityMap = new Map();
+  pages.forEach(page => {
+    try {
+      const date = page.updatedAt
+        ? new Date(page.updatedAt).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0];
+      activityMap.set(date, (activityMap.get(date) || 0) + 1);
+    } catch (e) {
+      console.warn("Invalid date in heatmap:", page.updatedAt);
+    }
+  });
+
+  const finalActivityData = heatmapData.map(day => {
+    const count = activityMap.get(day.date) || 0;
+    return {
+      ...day,
+      count,
+      level: count > 0 ? (count > 5 ? 4 : Math.ceil(count / 2)) : 0
+    };
+  });
+
+  const toggle2FA = async () => {
+    const newState = !profileData?.isTwoFactorEnabled;
+    if (newState) {
+      // Enabling 2FA - need to verify first
+      setPendingAction('enable2fa');
+      setShowOTPModal(true);
+    } else {
+      // Disabling 2FA - also verify
+      setPendingAction('disable2fa');
+      setShowOTPModal(true);
+    }
+  };
+
+  const handleOTPSuccess = async () => {
+    if (pendingAction === 'enable2fa') {
+      await updateUserProfile(user.email, { isTwoFactorEnabled: true });
+      setProfileData({ ...profileData, isTwoFactorEnabled: true });
+    } else if (pendingAction === 'disable2fa') {
+      await updateUserProfile(user.email, { isTwoFactorEnabled: false });
+      setProfileData({ ...profileData, isTwoFactorEnabled: false });
+    }
+    setPendingAction(null);
   };
 
   return (
     <div className="flex h-full w-full overflow-hidden relative overflow-y-auto">
 
 
-      <div className="w-full max-w-4xl mx-auto space-y-8 pb-20 p-6 md:p-10 lg:p-12 relative z-10">
+      <div className="w-full max-w-4xl mx-auto space-y-8 pb-32 p-6 md:p-10 lg:p-12 relative z-10">
 
         {/* Profile Header */}
         <motion.div
@@ -140,7 +223,29 @@ export default function ProfilePage() {
             )}
 
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-bold text-white mb-2">{user.email?.split('@')[0]}</h1>
+              {isEditingName ? (
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                  <input
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    className="bg-neutral-900 border border-emerald-500/50 rounded px-2 py-1 text-2xl font-bold text-white focus:outline-none focus:ring-2 ring-emerald-500"
+                    autoFocus
+                  />
+                  <button onClick={updateName} className="p-1 hover:bg-emerald-500/20 rounded text-emerald-500"><Check className="w-5 h-5" /></button>
+                  <button onClick={() => setIsEditingName(false)} className="p-1 hover:bg-red-500/20 rounded text-red-500"><X className="w-5 h-5" /></button>
+                </div>
+              ) : (
+                <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3 group">
+                  {profileData?.name || user.email?.split('@')[0]}
+                  <Edit2
+                    className="w-4 h-4 text-neutral-600 group-hover:text-emerald-500 cursor-pointer transition-colors opacity-0 group-hover:opacity-100"
+                    onClick={() => {
+                      setNameInput(profileData?.name || user.email?.split('@')[0] || "");
+                      setIsEditingName(true);
+                    }}
+                  />
+                </h1>
+              )}
               <p className="text-neutral-500 flex items-center justify-center md:justify-start gap-2">
                 <Shield className="w-4 h-4 text-emerald-400" />
                 {profileData?.isPremium ? "Premium Vault Member" : "Vault Member"}
@@ -193,27 +298,20 @@ export default function ProfilePage() {
           </h2>
           <div className="w-full overflow-x-auto pb-2">
             <ActivityCalendar
-              data={activityData}
-              theme={{
-                light: ['#404040', '#0e4429', '#006d32', '#26a641', '#39d353'],
-                dark: ['#404040', '#0e4429', '#006d32', '#26a641', '#39d353'],
-              }}
+              data={finalActivityData}
+              blockSize={12}
+              blockMargin={4}
+              blockRadius={3}
+              fontSize={14}
+              showWeekdayLabels
+              weekStart={1}
               labels={{
-                legend: {
-                  less: 'Less',
-                  more: 'More',
-                },
-                months: [
-                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-                ],
-                totalCount: '{{count}} activities in {{year}}',
-                weekdays: [
-                  'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-                ]
+                totalCount: '{{count}} activities in the last year'
               }}
-              colorScheme="dark"
-              maxLevel={4}
+              theme={{
+                light: ['#303030', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                dark: ['#303030', '#0e4429', '#006d32', '#26a641', '#39d353'],
+              }}
             />
           </div>
         </motion.div>
@@ -236,7 +334,7 @@ export default function ProfilePage() {
                   <div className="text-xs text-neutral-500">{user.email}</div>
                 </div>
               </div>
-              <button className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Change</button>
+              <button onClick={() => setShowEmailModal(true)} className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">Change</button>
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
@@ -257,6 +355,19 @@ export default function ProfilePage() {
         </motion.div>
 
       </div>
+
+      {/* Modals */}
+      <OTPModal
+        isOpen={showOTPModal}
+        onClose={() => { setShowOTPModal(false); setPendingAction(null); }}
+        email={user.email}
+        onSuccess={handleOTPSuccess}
+      />
+      <EmailChangeModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        currentEmail={user.email}
+      />
     </div>
   );
 }

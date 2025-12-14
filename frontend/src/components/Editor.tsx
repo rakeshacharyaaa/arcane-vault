@@ -96,15 +96,17 @@ export function Editor({ page }: EditorProps) {
   const addTag = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
-      if (!page.tags.includes(tagInput.trim())) {
-        updatePage(page.id, { tags: [...page.tags, tagInput.trim()] });
+      const currentTags = page.tags || [];
+      if (!currentTags.includes(tagInput.trim())) {
+        updatePage(page.id, { tags: [...currentTags, tagInput.trim()] });
       }
       setTagInput("");
     }
   };
 
   const removeTag = (tag: string) => {
-    updatePage(page.id, { tags: page.tags.filter(t => t !== tag) });
+    const currentTags = page.tags || [];
+    updatePage(page.id, { tags: currentTags.filter(t => t !== tag) });
   };
 
   // Local state for title to prevent typing lag
@@ -179,7 +181,7 @@ export function Editor({ page }: EditorProps) {
         {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap min-h-[32px]">
           <TagIcon className="w-4 h-4 text-neutral-600" />
-          {page.tags.map(tag => (
+          {(page.tags || []).map(tag => (
             <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400">
               {tag}
               <button onClick={() => removeTag(tag)} className="hover:text-white"><X className="w-3 h-3" /></button>

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { JSONContent } from '@tiptap/react';
 import { supabase } from './supabase';
+import * as api from './api';
 
 export interface Page {
   id: string;
@@ -10,7 +11,7 @@ export interface Page {
   content: JSONContent;
   tags: string[];
   parentId: string | null;
-  isExpanded: boolean; // UI state, but strictly we can persist it to DB as is_expanded
+  isExpanded: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -92,7 +93,6 @@ export const useStore = create<AppState>((set, get) => ({
 
     // DEV MODE BYPASS
     if (get().user?.id === 'dev-user') {
-      // Return a dummy page if none exist, or keep existing
       if (get().pages.length === 0) {
         const dummyPage: Page = {
           id: 'dev-page-1',
@@ -116,142 +116,68 @@ export const useStore = create<AppState>((set, get) => ({
       return;
     }
 
-    const { data, error } = await supabase
-      .from('pages')
-      .select('*')
-      .order('updated_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching pages:', error);
-    } else {
-      const pages = (data as DBPage[]).map(mapDBPageToPage);
-      set({ pages });
+    try {
+      const user = get().user;
+      if (user?.email) {
+        const pages = await api.fetchUserPages(user.email);
+        set({ pages });
+      }
+    } catch (e) {
+      console.error("Fetch failed", e);
     }
     set({ isLoading: false });
   },
 
   subscribeToPages: () => {
-    if (get().user?.id === 'dev-user') return () => { };
-
-    const channel = supabase
-      .channel('public:pages')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'pages' },
-        async (payload) => {
-          console.log('Realtime update:', payload);
-          if (payload.eventType === 'INSERT') {
-            const newPage = mapDBPageToPage(payload.new as DBPage);
-            set(state => ({ pages: [newPage, ...state.pages] }));
-          } else if (payload.eventType === 'DELETE') {
-            set(state => ({ pages: state.pages.filter(p => p.id !== payload.old.id) }));
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedPage = mapDBPageToPage(payload.new as DBPage);
-            set(state => ({
-              pages: state.pages.map(p => p.id === updatedPage.id ? updatedPage : p)
-            }));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    return () => { };
   },
 
   addPage: async (parentId = null) => {
     const user = get().user;
-    if (!user) return null;
-
-    if (user.id === 'dev-user') {
-      const newPage: Page = {
-        id: `dev-page-${Date.now()}`,
-        title: "Untitled Dev Page",
-        content: { type: 'doc', content: [] },
-        tags: [],
-        icon: null,
-        coverImage: null,
-        parentId: parentId,
-        isExpanded: true,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-      set(state => ({ pages: [newPage, ...state.pages] }));
-      return newPage.id;
-    }
+    if (!user?.email) return null;
 
     const newPage = {
       title: "Untitled",
       content: { type: 'doc', content: [] },
-      parent_id: parentId,
-      user_id: user.id, // Bind to user
-      created_at: Date.now(),
-      updated_at: Date.now(),
-      is_expanded: true
+      parentId,
     };
 
-    const { data, error } = await supabase
-      .from('pages')
-      .insert(newPage)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error adding page:', error);
+    try {
+      const created = await api.createPage(user.email, newPage);
+      set(state => ({ pages: [created, ...state.pages] }));
+      return created.id;
+    } catch (e) {
+      console.error(e);
       return null;
     }
-
-    return data.id;
   },
 
   updatePage: async (id, updates, persist = true) => {
-    // Optimistic update
+    // Optimistic
     set(state => ({
       pages: state.pages.map(p => p.id === id ? { ...p, ...updates } : p)
     }));
 
-    if (get().user?.id === 'dev-user') return;
-
     if (!persist) return;
 
-    // Map updates to snake_case
-    const dbUpdates: any = { ...updates, updated_at: Date.now() };
-    if ('coverImage' in updates) {
-      dbUpdates.cover_image = updates.coverImage;
-      delete dbUpdates.coverImage;
+    try {
+      await api.updatePage(id, updates);
+    } catch (e) {
+      console.error(e);
     }
-    if ('parentId' in updates) {
-      dbUpdates.parent_id = updates.parentId;
-      delete dbUpdates.parentId;
-    }
-    if ('isExpanded' in updates) {
-      dbUpdates.is_expanded = updates.isExpanded;
-      delete dbUpdates.isExpanded;
-    }
-    // Remove other camelCase keys if present just in case
-    delete dbUpdates.createdAt;
-    delete dbUpdates.updatedAt;
-
-    const { error } = await supabase
-      .from('pages')
-      .update(dbUpdates)
-      .eq('id', id);
-
-    if (error) console.error('Error updating page:', error);
   },
 
   deletePage: async (id) => {
+    // Optimistic
     set(state => ({
       pages: state.pages.filter(p => p.id !== id)
     }));
 
-    if (get().user?.id === 'dev-user') return;
-
-    const { error } = await supabase
-      .from('pages')
-      .delete()
-      .eq('id', id);
-
-    if (error) console.error('Error deleting page:', error);
+    try {
+      await api.deletePage(id);
+    } catch (e) {
+      console.error(e);
+    }
   },
 
   togglePageExpand: async (id) => {

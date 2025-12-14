@@ -92,6 +92,9 @@ app.use((req, res, next) => {
     },
     () => {
       log(`serving on port ${port}`);
+      console.log("--------------------------------------");
+      console.log("🚀 BACKEND SERVER RESTART - VERSION 2.0 🚀");
+      console.log("--------------------------------------");
     },
   );
 })();
