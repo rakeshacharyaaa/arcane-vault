@@ -67,14 +67,11 @@ export default function ProfilePage() {
   });
 
   const avatars = [
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Leo&backgroundColor=022c22&clothingColor=10b981&accessoriesColor=34d399",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Zoe&backgroundColor=064e3b&clothingColor=34d399&accessoriesColor=10b981",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Max&backgroundColor=065f46&clothingColor=6ee7b7&accessoriesColor=34d399",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Ava&backgroundColor=022c22&clothingColor=34d399&accessoriesColor=10b981",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Kai&backgroundColor=064e3b&clothingColor=10b981&accessoriesColor=6ee7b7",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Mia&backgroundColor=065f46&clothingColor=34d399&accessoriesColor=10b981",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Jace&backgroundColor=022c22&clothingColor=6ee7b7&accessoriesColor=34d399",
-    "https://api.dicebear.com/9.x/avataaars/svg?seed=Lily&backgroundColor=064e3b&clothingColor=10b981&accessoriesColor=34d399"
+    "/avatars/emerald-1.jpg",
+    "/avatars/emerald-2.jpg",
+    "/avatars/emerald-3.jpg",
+    "/avatars/emerald-4.jpg",
+    "/avatars/emerald-5.jpg"
   ];
 
   const [isEditingName, setIsEditingName] = useState(false);
