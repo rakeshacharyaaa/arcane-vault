@@ -36,9 +36,9 @@ export function Navigation() {
                 <span className="text-[10px] font-medium">Menu</span>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 bg-gradient-to-b from-neutral-900 via-neutral-900 to-emerald-950/30 backdrop-blur-xl border-r border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.15)] text-white">
+            <SheetContent side="left" className="p-0 w-80 bg-black/95 backdrop-blur-xl border-r border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.15)] text-white bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.15),transparent_40%)]">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <Sidebar className="w-full h-full bg-transparent border-none shadow-none" />
+              <Sidebar className="w-full h-full !bg-transparent !border-none !shadow-none" />
             </SheetContent>
           </Sheet>
         </div>
