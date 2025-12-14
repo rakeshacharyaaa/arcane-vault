@@ -168,10 +168,10 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex h-full w-full overflow-hidden relative overflow-y-auto">
+    <div className="flex h-full w-full relative overflow-y-auto scrollbar-hide">
 
 
-      <div className="w-full max-w-4xl mx-auto space-y-8 pb-32 p-6 md:p-10 lg:p-12 relative z-10">
+      <div className="w-full max-w-4xl mx-auto space-y-8 pb-48 md:pb-32 p-6 md:p-10 lg:p-12 relative z-10">
 
         {/* Profile Header */}
         <motion.div
@@ -222,17 +222,17 @@ export default function ProfilePage() {
               </div>
             )}
 
-            <div className="text-center md:text-left flex-1">
+            <div className="text-center md:text-left flex-1 w-full max-w-[200px] md:max-w-none mx-auto md:mx-0">
               {isEditingName ? (
-                <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-2 w-full">
                   <input
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    className="bg-neutral-900 border border-emerald-500/50 rounded px-2 py-1 text-2xl font-bold text-white focus:outline-none focus:ring-2 ring-emerald-500"
+                    className="bg-neutral-900 border border-emerald-500/50 rounded px-2 py-1 text-xl md:text-2xl font-bold text-white focus:outline-none focus:ring-2 ring-emerald-500 w-full min-w-0"
                     autoFocus
                   />
-                  <button onClick={updateName} className="p-1 hover:bg-emerald-500/20 rounded text-emerald-500"><Check className="w-5 h-5" /></button>
-                  <button onClick={() => setIsEditingName(false)} className="p-1 hover:bg-red-500/20 rounded text-red-500"><X className="w-5 h-5" /></button>
+                  <button onClick={updateName} className="p-1 hover:bg-emerald-500/20 rounded text-emerald-500 flex-shrink-0"><Check className="w-5 h-5" /></button>
+                  <button onClick={() => setIsEditingName(false)} className="p-1 hover:bg-red-500/20 rounded text-red-500 flex-shrink-0"><X className="w-5 h-5" /></button>
                 </div>
               ) : (
                 <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3 group">
@@ -354,6 +354,8 @@ export default function ProfilePage() {
           </div>
         </motion.div>
 
+        {/* Explicit Spacer for Mobile Navigation */}
+        <div className="h-48 md:h-0 w-full" />
       </div>
 
       {/* Modals */}
