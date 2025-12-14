@@ -14,7 +14,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full md:w-20 md:h-screen md:static liquid-glass border-t-0 md:border-r-0 flex md:flex-col items-center justify-between z-50 md:py-8">
+    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static liquid-glass rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8">
 
       {/* Logo Area */}
       <div className="hidden md:flex flex-col items-center gap-4">
