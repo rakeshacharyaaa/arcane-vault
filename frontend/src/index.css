@@ -618,24 +618,22 @@
 
   /* Liquid Glass Effect (iPhone-like) */
   .liquid-glass {
-    background: rgba(255, 255, 255, 0.03);
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: radial-gradient(circle at top left, rgba(16, 185, 129, 0.15), transparent 40%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06),
-      inset 0 0 20px rgba(255, 255, 255, 0.05);
-    /* Inner glow */
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
   }
 
   .liquid-glass-emerald {
-    background: rgba(16, 185, 129, 0.05);
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: radial-gradient(circle at top left, rgba(16, 185, 129, 0.25), transparent 50%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(16, 185, 129, 0.4);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     box-shadow:
-      0 4px 30px rgba(16, 185, 129, 0.4),
-      inset 0 0 20px rgba(16, 185, 129, 0.1);
+      0 4px 30px rgba(16, 185, 129, 0.2),
+      inset 0 0 20px rgba(16, 185, 129, 0.05);
   }
 }
