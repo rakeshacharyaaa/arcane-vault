@@ -12,7 +12,7 @@ Arcane Vault is a personal knowledge management tool designed with a focus on ae
 - **Distraction-Free Editor**: A clean, block-based editor powered by Tiptap, supporting rich text, images, code blocks, and more.
 - **Activity Heatmap**: GitHub-style activity tracking to visualize your writing consistency over time.
 - **Profile Customization**: Choose from a curated set of emerald-themed avatars to personalize your vault identity.
-- **Security**: Local-first architecture (conceptually) with Supabase backend, supporting secure email authentication and Two-Factor Authentication (2FA).
+- **Security**:  Authentication powered by **Supabase**, including secure email login and Two-Factor Authentication (2FA). Designed with a local-first mindset.
 - **Mobile & PWA Ready**: Fully responsive design with Progressive Web App support for installable access.
 ## 📸 Screenshots
 
