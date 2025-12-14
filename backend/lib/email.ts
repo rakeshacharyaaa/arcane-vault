@@ -1,14 +1,23 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resend: Resend | null = null;
+if (process.env.RESEND_API_KEY) {
+  resend = new Resend(process.env.RESEND_API_KEY);
+} else {
+  console.warn("⚠️ RESEND_API_KEY is missing. Email features will not work.");
+}
 
 export async function sendOTPEmail(to: string, otp: string): Promise<boolean> {
-    try {
-        const { data, error } = await resend.emails.send({
-            from: 'Arcane Vault <noreply@resend.dev>',
-            to: [to],
-            subject: 'Your Arcane Vault OTP Code',
-            html: `
+  if (!resend) {
+    console.error('[Email] Resend client not initialized (missing API key)');
+    return false;
+  }
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Arcane Vault <noreply@resend.dev>',
+      to: [to],
+      subject: 'Your Arcane Vault OTP Code',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #10b981; text-align: center;">🔐 Arcane Vault</h1>
           <div style="background: #1a1a1a; border-radius: 12px; padding: 30px; text-align: center;">
@@ -21,28 +30,32 @@ export async function sendOTPEmail(to: string, otp: string): Promise<boolean> {
           </p>
         </div>
       `,
-        });
+    });
 
-        if (error) {
-            console.error('[Email] Failed to send OTP:', error);
-            return false;
-        }
-
-        console.log('[Email] OTP sent successfully to:', to, 'messageId:', data?.id);
-        return true;
-    } catch (err) {
-        console.error('[Email] Error sending OTP:', err);
-        return false;
+    if (error) {
+      console.error('[Email] Failed to send OTP:', error);
+      return false;
     }
+
+    console.log('[Email] OTP sent successfully to:', to, 'messageId:', data?.id);
+    return true;
+  } catch (err) {
+    console.error('[Email] Error sending OTP:', err);
+    return false;
+  }
 }
 
 export async function sendEmailChangeVerification(to: string, newEmail: string, verificationLink: string): Promise<boolean> {
-    try {
-        const { data, error } = await resend.emails.send({
-            from: 'Arcane Vault <noreply@resend.dev>',
-            to: [to],
-            subject: 'Confirm Your Email Change - Arcane Vault',
-            html: `
+  if (!resend) {
+    console.error('[Email] Resend client not initialized (missing API key)');
+    return false;
+  }
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'Arcane Vault <noreply@resend.dev>',
+      to: [to],
+      subject: 'Confirm Your Email Change - Arcane Vault',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #10b981; text-align: center;">📧 Email Change Request</h1>
           <div style="background: #1a1a1a; border-radius: 12px; padding: 30px; text-align: center;">
@@ -57,17 +70,17 @@ export async function sendEmailChangeVerification(to: string, newEmail: string, 
           </p>
         </div>
       `,
-        });
+    });
 
-        if (error) {
-            console.error('[Email] Failed to send email change verification:', error);
-            return false;
-        }
-
-        console.log('[Email] Email change verification sent to:', to, 'messageId:', data?.id);
-        return true;
-    } catch (err) {
-        console.error('[Email] Error sending email change verification:', err);
-        return false;
+    if (error) {
+      console.error('[Email] Failed to send email change verification:', error);
+      return false;
     }
+
+    console.log('[Email] Email change verification sent to:', to, 'messageId:', data?.id);
+    return true;
+  } catch (err) {
+    console.error('[Email] Error sending email change verification:', err);
+    return false;
+  }
 }
