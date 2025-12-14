@@ -107,24 +107,13 @@ export default function AuthPage() {
           {step === "login" ? (
             <>
               <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)" }}
+                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(16, 185, 129, 0.2)" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => signInWithGoogle()}
-                className="w-full py-3 bg-white text-black font-semibold rounded-xl hover:bg-neutral-200 transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-3 bg-white/5 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-2 group backdrop-blur-sm"
               >
-                <Chrome className="w-5 h-5" />
+                <Chrome className="w-5 h-5 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
                 <span>Sign in with Google</span>
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(52, 211, 153, 0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  useStore.getState().setUser({ id: 'dev-user', email: 'dev@example.com' });
-                  setLocation("/");
-                }}
-                className="mt-4 w-full py-3 bg-neutral-800 text-white font-semibold rounded-xl hover:bg-neutral-700 transition-all flex items-center justify-center gap-2 group"
-              >
-                <span>Dev Bypass</span>
               </motion.button>
             </>
           ) : (
