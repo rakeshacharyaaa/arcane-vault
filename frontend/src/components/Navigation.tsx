@@ -18,8 +18,8 @@ export function Navigation() {
 
       {/* Logo Area */}
       <div className="hidden md:flex flex-col items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-          <Sparkles className="w-5 h-5 text-emerald-400" />
+        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)] overflow-hidden">
+          <img src="/app-icon.jpg" alt="Logo" className="w-full h-full object-cover" />
         </div>
       </div>
 

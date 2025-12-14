@@ -145,7 +145,7 @@ export function Sidebar({ className }: { className?: string }) {
       <div className="p-4 space-y-4">
         {/* User / Workspace Switcher Mock */}
         <div className="flex items-center gap-2 px-2 py-1 hover:bg-white/5 rounded-lg cursor-pointer transition-colors">
-          <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-black">A</div>
+          <img src="/app-icon.jpg" alt="Logo" className="w-5 h-5 rounded object-cover" />
           <span className="text-sm font-medium text-neutral-200">Arcane Vault</span>
           <ChevronDown className="w-3 h-3 text-neutral-500 ml-auto" />
         </div>
