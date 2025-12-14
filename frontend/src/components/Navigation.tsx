@@ -4,6 +4,7 @@ import { Book, User, LogOut, Sparkles, Menu } from "lucide-react";
 import { motion } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/Sidebar";
+import appIcon from "@/assets/app-icon.jpg";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -14,12 +15,12 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static liquid-glass-emerald rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8 md:shadow-none">
+    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static bg-neutral-900/90 backdrop-blur-xl border border-emerald-500/20 rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8 md:shadow-none shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
 
       {/* Logo Area */}
       <div className="hidden md:flex flex-col items-center gap-4">
         <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.2)] overflow-hidden">
-          <img src="/app-icon.jpg" alt="Logo" className="w-full h-full object-cover" />
+          <img src={appIcon} alt="Logo" className="w-full h-full object-cover" />
         </div>
       </div>
 
@@ -35,7 +36,7 @@ export function Navigation() {
                 <span className="text-[10px] font-medium">Menu</span>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 bg-neutral-900/95 backdrop-blur-xl border-r border-white/10 shadow-2xl text-white">
+            <SheetContent side="left" className="p-0 w-80 bg-neutral-900/95 backdrop-blur-xl border-r border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.1)] text-white">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <Sidebar className="w-full h-full" />
             </SheetContent>

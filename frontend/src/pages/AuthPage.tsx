@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Chrome, ShieldCheck, ArrowRight } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { getUserProfile, send2FA, verify2FA } from "@/lib/api";
+import appIcon from "@/assets/app-icon.jpg";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
@@ -94,7 +95,7 @@ export default function AuthPage() {
               transition={{ delay: 0.2 }}
               className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)] mb-6 overflow-hidden"
             >
-              {step === "login" ? <img src="/app-icon.jpg" alt="Logo" className="w-full h-full object-cover" /> : <ShieldCheck className="w-6 h-6 text-emerald-400" />}
+              {step === "login" ? <img src={appIcon} alt="Logo" className="w-full h-full object-cover" /> : <ShieldCheck className="w-6 h-6 text-emerald-400" />}
             </motion.div>
             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
               {step === "login" ? "Arcane Vault" : "Two-Factor Auth"}
