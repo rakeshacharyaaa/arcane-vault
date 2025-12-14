@@ -52,21 +52,25 @@ export default function ProfilePage() {
   }));
 
   const avatars = [
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Garfield",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Ginger",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Missy"
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Leo&backgroundColor=022c22&clothingColor=10b981&accessoriesColor=34d399",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Zoe&backgroundColor=064e3b&clothingColor=34d399&accessoriesColor=10b981",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Max&backgroundColor=065f46&clothingColor=6ee7b7&accessoriesColor=34d399",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Ava&backgroundColor=022c22&clothingColor=34d399&accessoriesColor=10b981",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Kai&backgroundColor=064e3b&clothingColor=10b981&accessoriesColor=6ee7b7",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Mia&backgroundColor=065f46&clothingColor=34d399&accessoriesColor=10b981",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Jace&backgroundColor=022c22&clothingColor=6ee7b7&accessoriesColor=34d399",
+    "https://api.dicebear.com/9.x/avataaars/svg?seed=Lily&backgroundColor=064e3b&clothingColor=10b981&accessoriesColor=34d399"
   ];
 
   const updateAvatar = async (url: string) => {
     try {
-      await updateUserProfile(user.email, { avatarUrl: url });
+      console.log("Updating avatar for:", user.email, "to", url);
+      const res = await updateUserProfile(user.email, { avatarUrl: url });
+      console.log("Update response:", res);
       setProfileData({ ...profileData, avatarUrl: url });
       setIsEditingAvatar(false);
     } catch (e) {
-      console.error(e);
+      console.error("Failed to update avatar:", e);
     }
   };
 
@@ -90,57 +94,73 @@ export default function ProfilePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="liquid-glass p-8 rounded-3xl flex flex-col md:flex-row items-center gap-8 relative overflow-hidden"
+          className="liquid-glass rounded-3xl flex flex-col md:flex-row items-center gap-8 relative z-20"
         >
-          {/* Background Glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
+          {/* Background Glow Container - Isolated to prevent clipping dropdowns */}
+          <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full" />
+          </div>
 
-          <div className="relative group">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-neutral-800 to-black border-2 border-white/10 flex items-center justify-center shadow-xl overflow-hidden cursor-pointer" onClick={() => setIsEditingAvatar(true)}>
-              {profileData?.avatarUrl ? (
-                <img src={profileData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-2xl font-bold text-white">{(user?.email || "?").charAt(0).toUpperCase()}</span>
-              )}
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <Edit2 className="w-5 h-5 text-white" />
+          <div className="p-8 flex flex-col md:flex-row items-center gap-8 w-full relative z-10">
+            <div className="relative group">
+              <div
+                className="w-24 h-24 rounded-full bg-gradient-to-br from-neutral-800 to-black border-2 border-white/10 flex items-center justify-center shadow-xl overflow-hidden cursor-pointer relative"
+                onClick={() => setIsEditingAvatar(!isEditingAvatar)}
+              >
+                {profileData?.avatarUrl ? (
+                  <img src={profileData.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-bold text-white">{(user?.email || "?").charAt(0).toUpperCase()}</span>
+                )}
               </div>
+
+              {/* Edit Badge - Always Visible */}
+              <button
+                className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center text-white shadow-lg hover:bg-neutral-700 transition-colors z-20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditingAvatar(!isEditingAvatar);
+                }}
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+
+              {/* Status Dot */}
+              <div className="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-black shadow-[0_0_10px_rgba(16,185,129,0.5)] z-20 pointer-events-none" />
             </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 rounded-full border-4 border-black shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-          </div>
 
-          {isEditingAvatar && (
-            <div className="absolute top-full left-0 mt-4 p-4 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 flex gap-2 flex-wrap max-w-xs">
-              {avatars.map(url => (
-                <button key={url} onClick={() => updateAvatar(url)} className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 ring-emerald-500 transition-all">
-                  <img src={url} alt="Avatar option" className="w-full h-full" />
-                </button>
-              ))}
+            {isEditingAvatar && (
+              <div className="absolute top-full left-1/2 -translate-x-1/2 md:left-8 md:translate-x-0 mt-2 md:mt-4 p-4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl z-50 flex gap-2 flex-wrap max-w-xs shadow-2xl min-w-[200px] justify-center">
+                {avatars.map(url => (
+                  <button key={url} onClick={() => updateAvatar(url)} className="w-10 h-10 rounded-full overflow-hidden hover:ring-2 ring-emerald-500 transition-all">
+                    <img src={url} alt="Avatar option" className="w-full h-full" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-3xl font-bold text-white mb-2">{user.email?.split('@')[0]}</h1>
+              <p className="text-neutral-500 flex items-center justify-center md:justify-start gap-2">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                {profileData?.isPremium ? "Premium Vault Member" : "Vault Member"}
+              </p>
             </div>
-          )}
 
-          <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-bold text-white mb-2">{user.email?.split('@')[0]}</h1>
-            <p className="text-neutral-500 flex items-center justify-center md:justify-start gap-2">
-              <Shield className="w-4 h-4 text-emerald-400" />
-              {profileData?.isPremium ? "Premium Vault Member" : "Vault Member"}
-            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLogout}
+              className="px-6 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </motion.button>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="px-6 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </motion.button>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -175,8 +195,8 @@ export default function ProfilePage() {
             <ActivityCalendar
               data={activityData}
               theme={{
-                light: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
-                dark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                light: ['#404040', '#0e4429', '#006d32', '#26a641', '#39d353'],
+                dark: ['#404040', '#0e4429', '#006d32', '#26a641', '#39d353'],
               }}
               labels={{
                 legend: {

@@ -14,7 +14,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static liquid-glass rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8">
+    <nav className="fixed bottom-4 left-4 right-4 md:left-0 md:bg-transparent md:backdrop-blur-none md:border-none md:w-20 md:h-screen md:static liquid-glass-emerald rounded-2xl md:rounded-none flex md:flex-col items-center justify-between z-50 md:py-8 md:shadow-none">
 
       {/* Logo Area */}
       <div className="hidden md:flex flex-col items-center gap-4">
@@ -35,7 +35,7 @@ export function Navigation() {
                 <span className="text-[10px] font-medium">Menu</span>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 liquid-glass border-r-0">
+            <SheetContent side="left" className="p-0 w-80 bg-transparent border-none shadow-none text-white">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <Sidebar className="w-full h-full" />
             </SheetContent>
