@@ -92,9 +92,9 @@ export default function AuthPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)] mb-6"
+              className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.2)] mb-6 overflow-hidden"
             >
-              {step === "login" ? <Sparkles className="w-6 h-6 text-emerald-400" /> : <ShieldCheck className="w-6 h-6 text-emerald-400" />}
+              {step === "login" ? <img src="/app-icon.jpg" alt="Logo" className="w-full h-full object-cover" /> : <ShieldCheck className="w-6 h-6 text-emerald-400" />}
             </motion.div>
             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
               {step === "login" ? "Arcane Vault" : "Two-Factor Auth"}
