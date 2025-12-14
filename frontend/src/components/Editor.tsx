@@ -17,7 +17,9 @@ import {
   Smile,
   X,
   Tag as TagIcon,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Plus
+  Plus
 } from "lucide-react";
 import { Page, useStore } from "@/lib/store";
 
@@ -194,6 +196,11 @@ export function Editor({ page }: EditorProps) {
             placeholder="Add tag..."
             className="bg-transparent text-sm text-neutral-400 placeholder:text-neutral-700 outline-none border-none min-w-[80px]"
           />
+          {tagInput.trim() && (
+            <button onClick={() => addTag({ key: 'Enter', preventDefault: () => { } } as any)} className="text-emerald-500 hover:text-emerald-400">
+              <Plus className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

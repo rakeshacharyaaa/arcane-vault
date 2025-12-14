@@ -35,7 +35,7 @@ export function Navigation() {
                 <span className="text-[10px] font-medium">Menu</span>
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 bg-transparent border-none shadow-none text-white">
+            <SheetContent side="left" className="p-0 w-80 bg-neutral-900/95 backdrop-blur-xl border-r border-white/10 shadow-2xl text-white">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <Sidebar className="w-full h-full" />
             </SheetContent>

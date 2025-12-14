@@ -235,10 +235,10 @@ export default function ProfilePage() {
                   <button onClick={() => setIsEditingName(false)} className="p-1 hover:bg-red-500/20 rounded text-red-500 flex-shrink-0"><X className="w-5 h-5" /></button>
                 </div>
               ) : (
-                <h1 className="text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3 group">
-                  {profileData?.name || user.email?.split('@')[0]}
+                <h1 className="text-2xl md:text-3xl font-bold text-white mb-2 flex items-center justify-center md:justify-start gap-3 group w-full">
+                  <span className="truncate max-w-[200px] md:max-w-md">{profileData?.name || user.email?.split('@')[0]}</span>
                   <Edit2
-                    className="w-4 h-4 text-neutral-600 group-hover:text-emerald-500 cursor-pointer transition-colors opacity-0 group-hover:opacity-100"
+                    className="w-4 h-4 text-neutral-400 md:text-neutral-600 group-hover:text-emerald-500 cursor-pointer transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100 flex-shrink-0"
                     onClick={() => {
                       setNameInput(profileData?.name || user.email?.split('@')[0] || "");
                       setIsEditingName(true);
