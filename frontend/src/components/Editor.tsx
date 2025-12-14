@@ -19,7 +19,6 @@ import {
   Tag as TagIcon,
   Image as ImageIcon,
   Plus
-  Plus
 } from "lucide-react";
 import { Page, useStore } from "@/lib/store";
 
