@@ -22,13 +22,13 @@ Abandon the static list. See your thoughts as a living, breathing **3D Constella
 - **Tiptap Editor**: A block-based, distraction-free writing experience.
 - **Real-time Sync**: Autosaving to Supabase (PostgreSQL).
 
-![Editor Blocks](docs/screenshots/editor-blocks.png)
+![Editor Blocks](docs/screenshots/astral-graph.png)
 
 ### 🛡️ Secure & Private
 - **Authentication**: Powered by **Supabase Auth** (Google OAuth + Magic Links).
 - **Row Level Security (RLS)**: Your notes are encrypted and only accessible by you.
 
-![Profile Dashboard](docs/screenshots/profile-dashboard.png)
+![Profile Dashboard](docs/screenshots/editor-blocks.png)
 
 ### 🎨 Premium "Mage-OS" UI
 - **Liquid Glass**: Glassmorphism, blurs, and noise textures.
