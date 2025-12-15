@@ -3,8 +3,6 @@
 > **A second brain for wizards.**
 > *Visualize your knowledge in a 3D cosmos.*
 
-[**🚀 Live Demo**](https://arcane-vault-ddmr.onrender.com)
-
 ![Astral Graph](docs/screenshots/login.png)
 
 Arcane Vault is a next-generation **Personal Knowledge Management (PKM)** tool designed for those who value aesthetics as much as utility. It combines a powerful infinite-depth note-taking system with a stunning **Astral Graph** visualization, all wrapped in a premium "Emerald & Glass" UI.
@@ -55,29 +53,8 @@ Abandon the static list. See your thoughts as a living, breathing **3D Constella
 
 ## 🚀 Getting Started
 
-1. **Clone**
-   ```bash
-   git clone https://github.com/rakeshacharyaaa/arcane-vault.git
-   cd arcane-vault
-   ```
-
-2. **Install**
-   ```bash
-   npm install
-   ```
-
-3. **Configure Environment**
-   Create a `.env` file with your Supabase credentials:
-   ```env
-   VITE_SUPABASE_URL=your_project_url
-   VITE_SUPABASE_ANON_KEY=your_anon_key
-   ```
-
-4. **Run**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:5173](http://localhost:5173) to enter the vault.
+**The app is deployed! check this live**
+[**🚀 Live Demo**](https://arcane-vault-ddmr.onrender.com)
 
 ## 📜 License
 
