@@ -3,7 +3,7 @@
 > **A second brain for wizards.**
 > *Visualize your knowledge in a 3D cosmos.*
 
-![Astral Graph](docs/screenshots/graph_preview.png)
+![Astral Graph](docs/screenshots/astral-graph.png)
 
 Arcane Vault is a next-generation **Personal Knowledge Management (PKM)** tool designed for those who value aesthetics as much as utility. It combines a powerful infinite-depth note-taking system with a stunning **Astral Graph** visualization, all wrapped in a premium "Emerald & Glass" UI.
 
@@ -20,14 +20,20 @@ Abandon the static list. See your thoughts as a living, breathing **3D Constella
 - **Tiptap Editor**: A block-based, distraction-free writing experience.
 - **Real-time Sync**: Autosaving to Supabase (PostgreSQL).
 
+![Editor Blocks](docs/screenshots/editor-blocks.png)
+
 ### 🛡️ Secure & Private
 - **Authentication**: Powered by **Supabase Auth** (Google OAuth + Magic Links).
 - **Row Level Security (RLS)**: Your notes are encrypted and only accessible by you.
+
+![Profile Dashboard](docs/screenshots/profile-dashboard.png)
 
 ### 🎨 Premium "Mage-OS" UI
 - **Liquid Glass**: Glassmorphism, blurs, and noise textures.
 - **Emerald Theme**: A soothing, deep green palette.
 - **Responsive**: Fully optimized for Desktop and Mobile (PWA support).
+
+![Settings UI](docs/screenshots/settings-ui.png)
 
 ---
 
