@@ -15,6 +15,8 @@ Abandon the static list. See your thoughts as a living, breathing **3D Constella
 - **Interactive 3D**: Zoom, pan, and rotate through your knowledge universe.
 - **Visuals**: glowing sprites, distance fog, and dynamic text labels.
 
+![Editor Blocks](docs/screenshots/landing-hero.png)
+
 ### 📝 Infinite Hierarchical Notes
 - **Recursive Depth**: Create sub-pages inside sub-pages infinitely.
 - **Tiptap Editor**: A block-based, distraction-free writing experience.
