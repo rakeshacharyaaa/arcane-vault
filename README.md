@@ -33,7 +33,7 @@ Abandon the static list. See your thoughts as a living, breathing **3D Constella
 - **Emerald Theme**: A soothing, deep green palette.
 - **Responsive**: Fully optimized for Desktop and Mobile (PWA support).
 
-![Settings UI](docs/screenshots/settings-ui.png)
+![Settings UI](docs/screenshots/profile-dashboard.png)
 
 ---
 
