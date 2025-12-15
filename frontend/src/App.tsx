@@ -21,12 +21,11 @@ function App() {
   const isAuthPage = location === "/auth";
 
   useEffect(() => {
-    // DEV BYPASS: Force login
-    setUser({ id: 'dev-user', email: 'dev@arcane.com' });
+
 
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (useStore.getState().user?.id === 'dev-user') return;
+
 
       setUser(session?.user ?? null);
       if (!session?.user && !isAuthPage) {
@@ -35,7 +34,7 @@ function App() {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (useStore.getState().user?.id === 'dev-user') return;
+
       setUser(session?.user ?? null);
       if (!session?.user) {
         setLocation("/auth");
