@@ -3,7 +3,7 @@
 > **A second brain for wizards.**
 > *Visualize your knowledge in a 3D cosmos.*
 
-![Astral Graph](docs/screenshots/astral-graph.png)
+![Astral Graph](docs/screenshots/login.png)
 
 Arcane Vault is a next-generation **Personal Knowledge Management (PKM)** tool designed for those who value aesthetics as much as utility. It combines a powerful infinite-depth note-taking system with a stunning **Astral Graph** visualization, all wrapped in a premium "Emerald & Glass" UI.
 
