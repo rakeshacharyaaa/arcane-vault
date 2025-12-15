@@ -23,13 +23,18 @@ export async function registerRoutes(
     let user = await storage.getUserByUsername(email);
 
     if (!user) {
-      // Create 'shadow' user in backend
-      user = await storage.createUser({
-        username: email,
-        password: "managed-by-supabase", // Dummy
-      });
-      // Update email field just in case
-      await storage.updateUser(user.id, { email: email });
+      try {
+        // Create 'shadow' user in backend
+        user = await storage.createUser({
+          username: email,
+          password: "managed-by-supabase", // Dummy
+        });
+        // Update email field just in case
+        await storage.updateUser(user.id, { email: email });
+      } catch (err: any) {
+        console.error("Error creating user:", err);
+        return res.status(500).json({ message: "Failed to create backend user: " + err.message });
+      }
     }
 
     res.json(user);

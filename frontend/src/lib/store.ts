@@ -92,30 +92,7 @@ export const useStore = create<AppState>()(persist((set, get) => ({
   fetchPages: async () => {
     set({ isLoading: true });
 
-    // DEV MODE BYPASS
-    if (get().user?.id === 'dev-user') {
-      if (get().pages.length === 0) {
-        const dummyPage: Page = {
-          id: 'dev-page-1',
-          title: 'Dev Page',
-          icon: '🛠️',
-          coverImage: null,
-          content: {
-            type: 'doc', content: [
-              { type: 'paragraph', content: [{ type: 'text', text: 'Welcome to Dev Mode. content allows testing editor behavior.' }] }
-            ]
-          },
-          tags: ['dev'],
-          parentId: null,
-          isExpanded: true,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        };
-        set({ pages: [dummyPage] });
-      }
-      set({ isLoading: false });
-      return;
-    }
+
 
     try {
       const user = get().user;
@@ -143,6 +120,8 @@ export const useStore = create<AppState>()(persist((set, get) => ({
       parentId,
     };
 
+
+
     try {
       const created = await api.createPage(user.email, newPage);
       set(state => ({ pages: [created, ...state.pages] }));
@@ -161,6 +140,7 @@ export const useStore = create<AppState>()(persist((set, get) => ({
 
     if (!persist) return;
 
+
     try {
       await api.updatePage(id, updates);
     } catch (e) {
@@ -173,6 +153,8 @@ export const useStore = create<AppState>()(persist((set, get) => ({
     set(state => ({
       pages: state.pages.filter(p => p.id !== id)
     }));
+
+
 
     try {
       await api.deletePage(id);

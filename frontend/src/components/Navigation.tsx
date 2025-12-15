@@ -2,15 +2,17 @@ import React from "react";
 import { Link, useLocation } from "wouter";
 import { Book, User, LogOut, Sparkles, Menu } from "lucide-react";
 import { motion } from "framer-motion";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/Sidebar";
 import appIcon from "@/assets/app-icon.jpg";
+import { cn } from "@/lib/utils";
 
 export function Navigation() {
   const [location] = useLocation();
 
   const links = [
     { href: "/", icon: Book, label: "Vault" },
+    { href: "/graph", icon: Sparkles, label: "Graph" },
     { href: "/profile", icon: User, label: "Profile" },
   ];
 
@@ -38,6 +40,7 @@ export function Navigation() {
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 bg-black/95 backdrop-blur-xl border-r border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.15)] text-white bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.15),transparent_40%)]">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <SheetDescription className="sr-only">Main mobile navigation menu</SheetDescription>
               <Sidebar className="w-full h-full !bg-transparent !border-none !shadow-none" />
             </SheetContent>
           </Sheet>
@@ -64,11 +67,9 @@ export function Navigation() {
         })}
       </div>
 
-      {/* Logout */}
+      {/* Bottom Area (Placeholder for future items like settings/logout) */}
       <div className="hidden md:flex flex-col items-center">
-        <Link href="/auth" className="p-3 text-neutral-500 hover:text-red-400 transition-colors rounded-xl hover:bg-white/5" title="Logout">
-          <LogOut className="w-5 h-5" />
-        </Link>
+        {/* Items removed to prevent duplication */}
       </div>
     </nav>
   );

@@ -8,6 +8,7 @@ import AuthPage from "@/pages/AuthPage";
 import VaultPage from "@/pages/VaultPage";
 import ProfilePage from "@/pages/ProfilePage";
 import NotFound from "@/pages/not-found";
+import AstralGraph from "@/components/AstralGraph";
 
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
@@ -20,6 +21,9 @@ function App() {
   const isAuthPage = location === "/auth";
 
   useEffect(() => {
+    // DEV BYPASS: Force login
+    setUser({ id: 'dev-user', email: 'dev@arcane.com' });
+
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (useStore.getState().user?.id === 'dev-user') return;
@@ -79,6 +83,7 @@ function App() {
             <Route path="/" component={VaultPage} />
             <Route path="/page/:id" component={VaultPage} />
             <Route path="/profile" component={ProfilePage} />
+            <Route path="/graph" component={AstralGraph} />
             <Route component={NotFound} />
           </Switch>
         </div>
