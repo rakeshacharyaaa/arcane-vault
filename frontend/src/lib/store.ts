@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { JSONContent } from '@tiptap/react';
 import { supabase } from './supabase';
 import * as api from './api';
@@ -63,7 +64,7 @@ const mapDBPageToPage = (p: DBPage): Page => ({
   updatedAt: p.updated_at
 });
 
-export const useStore = create<AppState>((set, get) => ({
+export const useStore = create<AppState>()(persist((set, get) => ({
   // Auth
   user: null,
 
@@ -187,4 +188,7 @@ export const useStore = create<AppState>((set, get) => ({
       await get().updatePage(id, { isExpanded: newExpanded });
     }
   }
+}), {
+  name: 'arcane-vault-storage',
+  partialize: (state) => ({ pages: state.pages, user: state.user }),
 }));
