@@ -10,7 +10,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import NotFound from "@/pages/not-found";
 import AstralGraph from "@/components/AstralGraph";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 
 import { supabase } from "@/lib/supabase";
@@ -19,26 +19,28 @@ function App() {
   const [location, setLocation] = useLocation();
   const { fetchPages, subscribeToPages, setUser, user } = useStore();
   const isAuthPage = location === "/auth";
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-
-
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
-
-
       setUser(session?.user ?? null);
-      if (!session?.user && !isAuthPage) {
+      setIsCheckingAuth(false);
+
+      const isCallback = window.location.search.includes("code=") || window.location.hash.includes("access_token=");
+      if (!session?.user && !isAuthPage && !isCallback) {
         setLocation("/auth");
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-
       setUser(session?.user ?? null);
-      if (!session?.user) {
-        setLocation("/auth");
-      } else if (location === "/auth") {
+
+      const isCallback = window.location.search.includes("code=") || window.location.hash.includes("access_token=");
+
+      if (!session?.user && !isAuthPage) {
+        if (!isCallback) setLocation("/auth");
+      } else if (session?.user && location === "/auth") {
         setLocation("/");
       }
     });
@@ -52,6 +54,10 @@ function App() {
     const unsubscribe = subscribeToPages();
     return () => { unsubscribe(); };
   }, [user, fetchPages, subscribeToPages]);
+
+  if (isCheckingAuth) {
+    return <div className="flex h-screen items-center justify-center bg-black text-emerald-500 font-mono">Loading Vault...</div>;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
